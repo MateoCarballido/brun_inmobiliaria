@@ -1,0 +1,292 @@
+<%- include('../partials/header') %>
+<%
+const hasFormData = formData && Object.keys(formData).some(function (key) {
+  const value = formData[key];
+  if (typeof value === 'boolean') return value;
+  return value !== undefined && value !== null && String(value).trim() !== '';
+});
+const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
+%>
+
+<section class="admin-properties-box admin-panel">
+  <div class="admin-head">
+    <h1>Propiedades</h1>
+    <p>Administra el catalogo de propiedades.</p>
+  </div>
+
+  <% if (adminMessage) { %>
+    <p class="success"><%= adminMessage %></p>
+  <% } %>
+
+  <div class="admin-toolbar">
+    <input
+      id="admin-property-search"
+      type="search"
+      class="admin-search"
+      placeholder="Buscar propiedades..."
+      aria-label="Buscar propiedades"
+    />
+    <button
+      id="toggle-create-form"
+      type="button"
+      class="btn btn-dark admin-new-btn"
+      aria-expanded="<%= shouldOpenCreateForm ? 'true' : 'false' %>"
+      aria-controls="create-property-panel"
+    >
+      + Nueva propiedad
+    </button>
+  </div>
+
+  <section
+    id="create-property-panel"
+    class="contact-box admin-create-panel <%= shouldOpenCreateForm ? '' : 'is-collapsed' %>"
+  >
+    <h2>Cargar propiedad</h2>
+    <p class="form-intro">Completa los campos clave para que la propiedad se vea clara en el buscador.</p>
+
+    <% if (errorMessage) { %>
+      <p class="error"><%= errorMessage %></p>
+    <% } %>
+
+    <form action="/propiedades/add" method="post" class="contact-form">
+      <label for="titulo">Titulo</label>
+      <p class="field-help">Ejemplo: Casa 4 ambientes con jardin en Palermo.</p>
+      <input id="titulo" name="titulo" type="text" required placeholder="Casa 4 ambientes con jardin en Palermo" value="<%= formData.titulo || '' %>" />
+
+      <label for="descripcion">Descripcion</label>
+      <p class="field-help">Conta lo mas importante: estado, ambientes, amenities, cercanias y puntos fuertes.</p>
+      <textarea id="descripcion" name="descripcion" rows="4" placeholder="Propiedad reciclada, muy luminosa, con patio y parrilla..."><%= formData.descripcion || '' %></textarea>
+
+      <div class="form-split">
+        <div>
+          <label for="operacion">Operacion</label>
+          <select id="operacion" name="operacion" required>
+            <option value="venta" <%= formData.operacion === 'venta' ? 'selected' : '' %>>Venta</option>
+            <option value="alquiler" <%= formData.operacion === 'alquiler' ? 'selected' : '' %>>Alquiler</option>
+          </select>
+        </div>
+        <div>
+          <label for="tipo">Tipo</label>
+          <select id="tipo" name="tipo" required>
+            <option value="casa" <%= formData.tipo === 'casa' ? 'selected' : '' %>>Casa</option>
+            <option value="departamento" <%= formData.tipo === 'departamento' ? 'selected' : '' %>>Departamento</option>
+            <option value="terreno" <%= formData.tipo === 'terreno' ? 'selected' : '' %>>Terreno</option>
+            <option value="local_comercial" <%= formData.tipo === 'local_comercial' ? 'selected' : '' %>>Local comercial</option>
+            <option value="oficina" <%= formData.tipo === 'oficina' ? 'selected' : '' %>>Oficina</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-split">
+        <div>
+          <label for="precio">Precio</label>
+          <p class="field-help">Sin puntos ni simbolos. Ejemplo: 185000</p>
+          <input id="precio" name="precio" type="number" min="1" step="0.01" required placeholder="185000" value="<%= formData.precio || '' %>" />
+        </div>
+        <div>
+          <label for="ubicacion">Ubicacion</label>
+          <p class="field-help">Formato recomendado: Barrio, Ciudad.</p>
+          <input id="ubicacion" name="ubicacion" type="text" required placeholder="Palermo, Buenos Aires" value="<%= formData.ubicacion || '' %>" />
+        </div>
+      </div>
+
+      <label for="direccion">Direccion (calle y numero)</label>
+      <p class="field-help">Ejemplo: Av. Santa Fe 1234.</p>
+      <input id="direccion" name="direccion" type="text" placeholder="Av. Santa Fe 1234" value="<%= formData.direccion || '' %>" />
+
+      <label for="imagen_principal">Imagen principal (nombre de archivo)</label>
+      <input id="imagen_principal" name="imagen_principal" type="text" placeholder="casa-palermo-01.jpg" value="<%= formData.imagen_principal || '' %>" />
+
+      <label for="imagenes_extra">Imagenes extra (una por linea)</label>
+      <textarea id="imagenes_extra" name="imagenes_extra" rows="3" placeholder="casa-palermo-02.jpg&#10;casa-palermo-03.jpg"><%= formData.imagenes_extra || '' %></textarea>
+
+      <div class="form-split">
+        <div>
+          <label for="dormitorios">Dormitorios</label>
+          <input id="dormitorios" name="dormitorios" type="number" min="0" placeholder="3" value="<%= formData.dormitorios || '' %>" />
+        </div>
+        <div>
+          <label for="banios">Baños</label>
+          <input id="banios" name="banios" type="number" min="0" placeholder="2" value="<%= formData.banios || '' %>" />
+        </div>
+        <div id="plantas-wrap">
+          <label for="plantas">Plantas</label>
+          <input id="plantas" name="plantas" type="number" min="1" placeholder="2" value="<%= formData.plantas || '' %>" />
+          <p class="field-help" id="plantas-help"></p>
+        </div>
+        <div id="piso-wrap">
+          <label for="piso">Piso N°</label>
+          <input id="piso" name="piso" type="text" placeholder="3A" value="<%= formData.piso || '' %>" />
+          <p class="field-help" id="piso-help"></p>
+        </div>
+      </div>
+
+      <div class="form-split">
+        <div>
+          <label for="superficie_cubierta_m2">m2 cubiertos</label>
+          <input id="superficie_cubierta_m2" name="superficie_cubierta_m2" type="number" min="0" step="0.01" placeholder="95" value="<%= formData.superficie_cubierta_m2 || '' %>" />
+        </div>
+        <div>
+          <label for="superficie_total_m2">m2 totales</label>
+          <input id="superficie_total_m2" name="superficie_total_m2" type="number" min="0" step="0.01" placeholder="120" value="<%= formData.superficie_total_m2 || '' %>" />
+        </div>
+      </div>
+
+      <label class="inline-check" for="destacada">
+        <input id="destacada" name="destacada" type="checkbox" <%= formData.destacada ? 'checked' : '' %> />
+        Marcar como destacada en el inicio
+      </label>
+
+      <div class="admin-edit-actions">
+        <button type="submit" class="btn">Guardar propiedad</button>
+        <button id="cancel-create-form" type="button" class="btn btn-light">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <% if (!adminProperties || adminProperties.length === 0) { %>
+    <p class="form-intro">Todavia no hay propiedades cargadas.</p>
+  <% } else { %>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Propiedad</th>
+            <th>Ubicacion</th>
+            <th>Precio</th>
+            <th>Operacion</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="admin-properties-body">
+          <% adminProperties.forEach(function(property) { %>
+            <tr>
+              <td data-admin-title="<%= (property.titulo || '').toLowerCase() %>">
+                <span class="admin-title"><%= property.titulo %></span>
+                <% if (property.destacada) { %>
+                  <span class="mini-badge">Destacada</span>
+                <% } %>
+              </td>
+              <td data-admin-location="<%= ((property.ubicacion || '') + ' ' + (property.direccion || '')).toLowerCase() %>">
+                <%= property.ubicacion %>
+                <% if (property.direccion) { %>
+                  <br />
+                  <small><%= property.direccion %></small>
+                <% } %>
+              </td>
+              <td>USD <%= Number(property.precio).toLocaleString('es-AR') %></td>
+              <td>
+                <span class="mini-badge mini-badge-soft"><%= property.operacion === 'alquiler' ? 'Alquiler' : 'Venta' %></span>
+              </td>
+              <td>
+                <div class="admin-actions">
+                  <a href="/propiedades/<%= property.id %>" class="mini-action">Ver</a>
+                  <a href="/propiedades/<%= property.id %>/edit" class="mini-action">Editar</a>
+                  <form action="/propiedades/<%= property.id %>/delete" method="post" onsubmit="return confirm('Seguro que queres eliminar esta propiedad?');">
+                    <button type="submit" class="mini-action mini-danger">Eliminar</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</section>
+
+<script>
+  (function () {
+    const panel = document.getElementById('create-property-panel');
+    const toggleBtn = document.getElementById('toggle-create-form');
+    const cancelBtn = document.getElementById('cancel-create-form');
+    const searchInput = document.getElementById('admin-property-search');
+    const tipoSelect = document.getElementById('tipo');
+    const plantasWrap = document.getElementById('plantas-wrap');
+    const pisoWrap = document.getElementById('piso-wrap');
+    const plantasInput = document.getElementById('plantas');
+    const pisoInput = document.getElementById('piso');
+    const plantasHelp = document.getElementById('plantas-help');
+    const pisoHelp = document.getElementById('piso-help');
+    const rows = Array.from(document.querySelectorAll('#admin-properties-body tr'));
+
+    function syncFieldsByTipo() {
+      if (!tipoSelect) return;
+      const isCasa = tipoSelect.value === 'casa';
+      const isDepartamento = tipoSelect.value === 'departamento';
+
+      if (plantasInput) {
+        plantasInput.disabled = !isCasa;
+        if (!isCasa) {
+          plantasInput.value = '';
+        }
+      }
+      if (plantasWrap) {
+        plantasWrap.hidden = !isCasa;
+      }
+
+      if (pisoInput) {
+        pisoInput.disabled = !isDepartamento;
+        if (!isDepartamento) {
+          pisoInput.value = '';
+        }
+      }
+      if (pisoWrap) {
+        pisoWrap.hidden = !isDepartamento;
+      }
+
+      if (plantasHelp) {
+        plantasHelp.textContent = isCasa
+          ? 'Cuantas plantas tiene la casa.'
+          : 'Se habilita solo si el tipo es Casa.';
+      }
+
+      if (pisoHelp) {
+        pisoHelp.textContent = isDepartamento
+          ? 'En qué piso se encuentra el departamento.'
+          : 'Se habilita solo si el tipo es Departamento.';
+      }
+    }
+
+    function setPanelState(open) {
+      panel.classList.toggle('is-collapsed', !open);
+      toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggleBtn.textContent = open ? '− Ocultar formulario' : '+ Nueva propiedad';
+    }
+
+    if (panel && toggleBtn) {
+      setPanelState(!panel.classList.contains('is-collapsed'));
+      toggleBtn.addEventListener('click', function () {
+        const isOpen = !panel.classList.contains('is-collapsed');
+        setPanelState(!isOpen);
+      });
+    }
+
+    if (panel && cancelBtn) {
+      cancelBtn.addEventListener('click', function () {
+        setPanelState(false);
+      });
+    }
+
+    if (tipoSelect) {
+      syncFieldsByTipo();
+      tipoSelect.addEventListener('change', syncFieldsByTipo);
+    }
+
+    if (searchInput && rows.length > 0) {
+      searchInput.addEventListener('input', function () {
+        const query = searchInput.value.trim().toLowerCase();
+        rows.forEach(function (row) {
+          const titleCell = row.querySelector('[data-admin-title]');
+          const locationCell = row.querySelector('[data-admin-location]');
+          const title = titleCell ? titleCell.getAttribute('data-admin-title') : '';
+          const location = locationCell ? locationCell.getAttribute('data-admin-location') : '';
+          const matches = !query || title.includes(query) || location.includes(query);
+          row.style.display = matches ? '' : 'none';
+        });
+      });
+    }
+  })();
+</script>
+
+<%- include('../partials/footer') %>

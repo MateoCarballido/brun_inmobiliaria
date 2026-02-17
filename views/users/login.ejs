@@ -1,0 +1,23 @@
+<%- include('../partials/header') %>
+
+<section class="contact-box auth-box">
+  <h1>Iniciar sesion</h1>
+
+  <% if (errorMessage) { %>
+    <p class="error"><%= errorMessage %></p>
+  <% } %>
+
+  <form action="/users/login" method="post" class="contact-form">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" required value="<%= formData.email || '' %>" />
+
+    <label for="password">Contrasena</label>
+    <input id="password" name="password" type="password" required />
+
+    <button type="submit" class="btn">Ingresar</button>
+  </form>
+
+  <p>Si no tenes cuenta, <a class="link" href="/users/register">registrate aca</a>.</p>
+</section>
+
+<%- include('../partials/footer') %>

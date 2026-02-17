@@ -1,0 +1,157 @@
+<%- include('../partials/header') %>
+
+<section class="contact-box">
+  <h1>Editar propiedad</h1>
+  <p class="form-intro">Actualiza los datos y guarda los cambios.</p>
+
+  <% if (errorMessage) { %>
+    <p class="error"><%= errorMessage %></p>
+  <% } %>
+
+  <form action="/propiedades/<%= propertyId %>/edit" method="post" class="contact-form">
+    <label for="titulo">Titulo</label>
+    <input id="titulo" name="titulo" type="text" required value="<%= formData.titulo || '' %>" />
+
+    <label for="descripcion">Descripcion</label>
+    <textarea id="descripcion" name="descripcion" rows="4"><%= formData.descripcion || '' %></textarea>
+
+    <div class="form-split">
+      <div>
+        <label for="operacion">Operacion</label>
+        <select id="operacion" name="operacion" required>
+          <option value="venta" <%= formData.operacion === 'venta' ? 'selected' : '' %>>Venta</option>
+          <option value="alquiler" <%= formData.operacion === 'alquiler' ? 'selected' : '' %>>Alquiler</option>
+        </select>
+      </div>
+      <div>
+        <label for="tipo">Tipo</label>
+        <select id="tipo" name="tipo" required>
+          <option value="casa" <%= formData.tipo === 'casa' ? 'selected' : '' %>>Casa</option>
+          <option value="departamento" <%= formData.tipo === 'departamento' ? 'selected' : '' %>>Departamento</option>
+          <option value="terreno" <%= formData.tipo === 'terreno' ? 'selected' : '' %>>Terreno</option>
+          <option value="local_comercial" <%= formData.tipo === 'local_comercial' ? 'selected' : '' %>>Local comercial</option>
+          <option value="oficina" <%= formData.tipo === 'oficina' ? 'selected' : '' %>>Oficina</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-split">
+      <div>
+        <label for="precio">Precio</label>
+        <input id="precio" name="precio" type="number" min="1" step="0.01" required value="<%= formData.precio || '' %>" />
+      </div>
+      <div>
+        <label for="ubicacion">Ubicacion</label>
+        <input id="ubicacion" name="ubicacion" type="text" required value="<%= formData.ubicacion || '' %>" />
+      </div>
+    </div>
+
+    <label for="direccion">Direccion (calle y numero)</label>
+    <input id="direccion" name="direccion" type="text" value="<%= formData.direccion || '' %>" />
+
+    <label for="imagen_principal">Imagen principal (nombre de archivo)</label>
+    <input id="imagen_principal" name="imagen_principal" type="text" value="<%= formData.imagen_principal || '' %>" />
+
+    <label for="imagenes_extra">Imagenes extra (una por linea)</label>
+    <textarea id="imagenes_extra" name="imagenes_extra" rows="3"><%= formData.imagenes_extra || '' %></textarea>
+
+    <div class="form-split">
+      <div>
+        <label for="dormitorios">Dormitorios</label>
+        <input id="dormitorios" name="dormitorios" type="number" min="0" value="<%= formData.dormitorios || '' %>" />
+      </div>
+      <div>
+        <label for="banios">Baños</label>
+        <input id="banios" name="banios" type="number" min="0" value="<%= formData.banios || '' %>" />
+      </div>
+      <div id="plantas-wrap">
+        <label for="plantas">Plantas</label>
+        <input id="plantas" name="plantas" type="number" min="1" value="<%= formData.plantas || '' %>" />
+        <p class="field-help" id="plantas-help"></p>
+      </div>
+      <div id="piso-wrap">
+        <label for="piso">Piso N°</label>
+        <input id="piso" name="piso" type="text" value="<%= formData.piso || '' %>" />
+        <p class="field-help" id="piso-help"></p>
+      </div>
+    </div>
+
+    <div class="form-split">
+      <div>
+        <label for="superficie_cubierta_m2">m2 cubiertos</label>
+        <input id="superficie_cubierta_m2" name="superficie_cubierta_m2" type="number" min="0" step="0.01" value="<%= formData.superficie_cubierta_m2 || '' %>" />
+      </div>
+      <div>
+        <label for="superficie_total_m2">m2 totales</label>
+        <input id="superficie_total_m2" name="superficie_total_m2" type="number" min="0" step="0.01" value="<%= formData.superficie_total_m2 || '' %>" />
+      </div>
+    </div>
+
+    <label class="inline-check" for="destacada">
+      <input id="destacada" name="destacada" type="checkbox" <%= formData.destacada ? 'checked' : '' %> />
+      Marcar como destacada en el inicio
+    </label>
+
+    <div class="admin-edit-actions">
+      <button type="submit" class="btn">Guardar cambios</button>
+      <a href="/propiedades/add" class="btn btn-light">Volver al panel</a>
+    </div>
+  </form>
+</section>
+
+<script>
+  (function () {
+    const tipoSelect = document.getElementById('tipo');
+    const plantasWrap = document.getElementById('plantas-wrap');
+    const pisoWrap = document.getElementById('piso-wrap');
+    const plantasInput = document.getElementById('plantas');
+    const pisoInput = document.getElementById('piso');
+    const plantasHelp = document.getElementById('plantas-help');
+    const pisoHelp = document.getElementById('piso-help');
+
+    function syncFieldsByTipo() {
+      if (!tipoSelect) return;
+      const isCasa = tipoSelect.value === 'casa';
+      const isDepartamento = tipoSelect.value === 'departamento';
+
+      if (plantasInput) {
+        plantasInput.disabled = !isCasa;
+        if (!isCasa) {
+          plantasInput.value = '';
+        }
+      }
+      if (plantasWrap) {
+        plantasWrap.hidden = !isCasa;
+      }
+
+      if (pisoInput) {
+        pisoInput.disabled = !isDepartamento;
+        if (!isDepartamento) {
+          pisoInput.value = '';
+        }
+      }
+      if (pisoWrap) {
+        pisoWrap.hidden = !isDepartamento;
+      }
+
+      if (plantasHelp) {
+        plantasHelp.textContent = isCasa
+          ? 'Opcional para casas.'
+          : 'Se habilita solo si el tipo es Casa.';
+      }
+
+      if (pisoHelp) {
+        pisoHelp.textContent = isDepartamento
+          ? 'Opcional para departamentos.'
+          : 'Se habilita solo si el tipo es Departamento.';
+      }
+    }
+
+    if (tipoSelect) {
+      syncFieldsByTipo();
+      tipoSelect.addEventListener('change', syncFieldsByTipo);
+    }
+  })();
+</script>
+
+<%- include('../partials/footer') %>

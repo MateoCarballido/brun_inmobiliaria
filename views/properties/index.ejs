@@ -1,0 +1,186 @@
+<%- include('../partials/header') %>
+<%
+function resolveImageSrc(value) {
+  if (!value) return '/images/placeholder-property.svg';
+  const raw = String(value);
+  if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('/')) return raw;
+  return '/images/' + raw.replace(/^images\//, '').replace(/^\/images\//, '');
+}
+%>
+
+<section class="section-header properties-head">
+  <h1>Propiedades</h1>
+  <p>Encontra la propiedad perfecta entre nuestra seleccion exclusiva.</p>
+</section>
+
+<section class="properties-layout">
+  <aside class="filters-panel" id="filters-panel">
+    <div class="filters-title-row">
+      <h2>Filtros</h2>
+      <div class="filters-actions">
+        <a class="clear-link" href="/propiedades">Limpiar</a>
+        <button
+          type="button"
+          class="collapse-toggle filters-collapse-btn"
+          id="filters-collapse-btn"
+          aria-expanded="true"
+          data-collapse-target="filters-form-panel"
+        >
+          <span class="collapse-icon">▾</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="filters-form-panel" class="collapse-panel">
+    <form action="/propiedades" method="get" class="filters-form">
+      <label for="search">Busqueda</label>
+      <input id="search" name="search" type="text" placeholder="Titulo o zona" value="<%= filtros.search || '' %>" />
+
+      <label for="operacion">Operacion</label>
+      <select id="operacion" name="operacion">
+        <option value="">Seleccionar</option>
+        <option value="venta" <%= filtros.operacion === 'venta' ? 'selected' : '' %>>Venta</option>
+        <option value="alquiler" <%= filtros.operacion === 'alquiler' ? 'selected' : '' %>>Alquiler</option>
+      </select>
+
+      <label for="tipo">Tipo de propiedad</label>
+      <select id="tipo" name="tipo">
+        <option value="">Seleccionar</option>
+        <option value="casa" <%= filtros.tipo === 'casa' ? 'selected' : '' %>>Casa</option>
+        <option value="departamento" <%= filtros.tipo === 'departamento' ? 'selected' : '' %>>Departamento</option>
+        <option value="terreno" <%= filtros.tipo === 'terreno' ? 'selected' : '' %>>Terreno</option>
+        <option value="local_comercial" <%= filtros.tipo === 'local_comercial' ? 'selected' : '' %>>Local comercial</option>
+        <option value="oficina" <%= filtros.tipo === 'oficina' ? 'selected' : '' %>>Oficina</option>
+      </select>
+
+      <label for="ubicacion">Ubicacion</label>
+      <input id="ubicacion" name="ubicacion" type="text" placeholder="Ej: Palermo, Buenos Aires" value="<%= filtros.ubicacion || '' %>" />
+
+      <label>Precio</label>
+      <div class="inline-2">
+        <input name="precioMin" type="number" min="0" step="0.01" placeholder="Minimo" value="<%= filtros.precioMin || '' %>" />
+        <input name="precioMax" type="number" min="0" step="0.01" placeholder="Maximo" value="<%= filtros.precioMax || '' %>" />
+      </div>
+
+      <label for="dormitorios">Dormitorios</label>
+      <select id="dormitorios" name="dormitorios">
+        <option value="">Cualquiera</option>
+        <option value="1" <%= filtros.dormitorios === '1' ? 'selected' : '' %>>1+</option>
+        <option value="2" <%= filtros.dormitorios === '2' ? 'selected' : '' %>>2+</option>
+        <option value="3" <%= filtros.dormitorios === '3' ? 'selected' : '' %>>3+</option>
+        <option value="4" <%= filtros.dormitorios === '4' ? 'selected' : '' %>>4+</option>
+      </select>
+
+      <label for="banios">Baños</label>
+      <select id="banios" name="banios">
+        <option value="">Cualquiera</option>
+        <option value="1" <%= filtros.banios === '1' ? 'selected' : '' %>>1+</option>
+        <option value="2" <%= filtros.banios === '2' ? 'selected' : '' %>>2+</option>
+        <option value="3" <%= filtros.banios === '3' ? 'selected' : '' %>>3+</option>
+      </select>
+
+      <button type="submit" class="btn filters-btn">Aplicar filtros</button>
+    </form>
+    </div>
+  </aside>
+
+  <div class="properties-content">
+    <p class="results-text">Mostrando <strong><%= properties.length %></strong> propiedades</p>
+
+    <section class="properties-grid">
+      <% properties.forEach(function(property) { %>
+        <% const coverImage = resolveImageSrc(property.imagen_principal || (property.images && property.images.length ? property.images[0].url : property.imagen)); %>
+        <article class="property-card">
+          <div class="card-image-wrap">
+            <a class="card-image-link" href="/propiedades/<%= property.id %>">
+              <img src="<%= coverImage %>" alt="<%= property.titulo %>" />
+              <% if (property.operacion) { %>
+                <span class="badge badge-dark"><%= property.operacion === 'venta' ? 'Venta' : 'Alquiler' %></span>
+              <% } %>
+              <% if (property.destacada) { %>
+                <span class="badge badge-light">Destacado</span>
+              <% } %>
+              <span class="card-image-cta">Ver detalle</span>
+            </a>
+          </div>
+
+          <div class="property-body">
+            <div class="row-between">
+              <h3 class="card-title"><%= property.titulo %></h3>
+              <p class="price"><span>USD</span><span class="price-value"><%= Number(property.precio).toLocaleString('es-AR') %></span></p>
+            </div>
+            <p class="location location-line">
+              <span class="mini-svg" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                  <path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z"></path>
+                  <circle cx="12" cy="11" r="2.3"></circle>
+                </svg>
+              </span>
+              <%= property.ubicacion %>
+            </p>
+            <p class="details details-icons">
+              <span class="meta-item">
+                <span class="mini-svg" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <path d="M3 12V7h7v5"></path>
+                    <path d="M10 10h11v7h-2"></path>
+                    <path d="M3 17h18"></path>
+                  </svg>
+                </span>
+                <%= property.dormitorios || property.habitaciones || '-' %>
+              </span>
+              <span class="meta-item">
+                <span class="mini-svg" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <path d="M3 13h18"></path>
+                    <path d="M7 13V9a4 4 0 1 1 8 0v4"></path>
+                    <path d="M5 13v4"></path>
+                    <path d="M19 13v4"></path>
+                  </svg>
+                </span>
+                <%= property.banios || property.banos || '-' %>
+              </span>
+              <span class="meta-item">
+                <span class="mini-svg" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                    <path d="M9 3H3v6"></path>
+                    <path d="M15 3h6v6"></path>
+                    <path d="M3 15v6h6"></path>
+                    <path d="M21 15v6h-6"></path>
+                  </svg>
+                </span>
+                <%= property.superficie_m2 || property.m2 || '-' %>m<sup>2</sup>
+              </span>
+            </p>
+          </div>
+        </article>
+      <% }) %>
+    </section>
+
+    <% if (properties.length === 0) { %>
+      <p>No se encontraron propiedades con los filtros aplicados.</p>
+    <% } %>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const btn = document.getElementById('filters-collapse-btn');
+    const panel = document.getElementById('filters-form-panel');
+    if (!btn || !panel) return;
+
+    function applyState(expanded) {
+      btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      panel.classList.toggle('is-collapsed', !expanded);
+    }
+
+    applyState(!panel.classList.contains('is-collapsed'));
+
+    btn.addEventListener('click', function () {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      applyState(!expanded);
+    });
+  })();
+</script>
+
+<%- include('../partials/footer') %>

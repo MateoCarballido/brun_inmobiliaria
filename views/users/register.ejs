@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+
+<section class="contact-box auth-box">
+  <h1>Crear cuenta</h1>
+
+  <% if (errorMessage) { %>
+    <p class="error"><%= errorMessage %></p>
+  <% } %>
+
+  <form action="/users/register" method="post" class="contact-form">
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" required value="<%= formData.username || '' %>" />
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" required value="<%= formData.email || '' %>" />
+
+    <label for="password">Contrasena</label>
+    <input id="password" name="password" type="password" required />
+
+    <button type="submit" class="btn">Crear usuario</button>
+  </form>
+
+  <p>Si ya tenes cuenta, <a class="link" href="/users/login">inicia sesion</a>.</p>
+</section>
+
+<%- include('../partials/footer') %>

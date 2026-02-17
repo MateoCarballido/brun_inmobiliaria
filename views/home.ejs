@@ -1,0 +1,120 @@
+<%- include('partials/header') %>
+<%
+function resolveImageSrc(value) {
+  if (!value) return '/images/placeholder-property.svg';
+  const raw = String(value);
+  if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('/')) return raw;
+  return '/images/' + raw.replace(/^images\//, '').replace(/^\/images\//, '');
+}
+%>
+
+<section class="landing-hero">
+  <h1>Encontrá tu<br/>hogar ideal</h1>
+  <p>Descubri las mejores propiedades en venta y alquiler. Te acompanamos en cada paso hacia tu nuevo hogar.</p>
+
+  <div class="hero-actions">
+    <a class="btn btn-dark" href="/propiedades">Ver propiedades</a>
+    <a class="btn btn-light" href="/contacto">Contactanos</a>
+  </div>
+</section>
+
+<section class="landing-search-wrap">
+  <form action="/propiedades" method="get" class="landing-search-form">
+    <select name="operacion">
+      <option value="">Operacion</option>
+      <option value="venta">Venta</option>
+      <option value="alquiler">Alquiler</option>
+    </select>
+
+    <select name="tipo">
+      <option value="">Tipo de propiedad</option>
+      <option value="casa">Casa</option>
+      <option value="departamento">Departamento</option>
+      <option value="terreno">Terreno</option>
+      <option value="local_comercial">Local comercial</option>
+      <option value="oficina">Oficina</option>
+    </select>
+
+    <input name="ubicacion" type="text" placeholder="Ubicacion" />
+    <input name="precioMin" type="number" min="0" step="0.01" placeholder="Precio min" />
+
+    <button type="submit" class="btn btn-dark search-btn">Buscar</button>
+  </form>
+</section>
+
+<section class="landing-featured-head">
+  <div>
+    <h2>Propiedades destacadas</h2>
+    <p>Las mejores oportunidades del momento</p>
+  </div>
+  <a href="/propiedades" class="link">Ver todas</a>
+</section>
+
+<section class="properties-grid home-cards">
+  <% featuredProperties.slice(0, 6).forEach(function(property) { %>
+    <% const coverImage = resolveImageSrc(property.imagen_principal || (property.images && property.images.length ? property.images[0].url : property.imagen)); %>
+    <article class="property-card">
+      <div class="card-image-wrap">
+        <a class="card-image-link" href="/propiedades/<%= property.id %>">
+          <img src="<%= coverImage %>" alt="<%= property.titulo %>" />
+          <% if (property.operacion) { %>
+            <span class="badge badge-dark"><%= property.operacion === 'venta' ? 'Venta' : 'Alquiler' %></span>
+          <% } %>
+          <span class="card-image-cta">Ver detalle</span>
+        </a>
+      </div>
+
+      <div class="property-body">
+        <div class="row-between">
+          <h3 class="card-title"><%= property.titulo %></h3>
+          <p class="price"><span>USD</span><span class="price-value"><%= Number(property.precio).toLocaleString('es-AR') %></span></p>
+        </div>
+        <p class="location location-line">
+          <span class="mini-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z"></path>
+              <circle cx="12" cy="11" r="2.3"></circle>
+            </svg>
+          </span>
+          <%= property.ubicacion %>
+        </p>
+        <p class="details details-icons">
+          <span class="meta-item">
+            <span class="mini-svg" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M3 12V7h7v5"></path>
+                <path d="M10 10h11v7h-2"></path>
+                <path d="M3 17h18"></path>
+              </svg>
+            </span>
+            <%= property.dormitorios || '-' %>
+          </span>
+          <span class="meta-item">
+            <span class="mini-svg" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M3 13h18"></path>
+                <path d="M7 13V9a4 4 0 1 1 8 0v4"></path>
+                <path d="M5 13v4"></path>
+                <path d="M19 13v4"></path>
+              </svg>
+            </span>
+            <%= property.banios || '-' %>
+          </span>
+          <span class="meta-item">
+            <span class="mini-svg" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M9 3H3v6"></path>
+                <path d="M15 3h6v6"></path>
+                <path d="M3 15v6h6"></path>
+                <path d="M21 15v6h-6"></path>
+              </svg>
+            </span>
+            <%= property.superficie_m2 || '-' %>m<sup>2</sup>
+          </span>
+        </p>
+      </div>
+    </article>
+  <% }) %>
+</section>
+
+<%- include('partials/footer') %>

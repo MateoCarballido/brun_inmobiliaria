@@ -1,0 +1,401 @@
+<%- include('../partials/header') %>
+<%
+function resolveImageSrc(value) {
+  if (!value) return '/images/placeholder-property.svg';
+  const raw = String(value);
+  if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('/')) return raw;
+  return '/images/' + raw.replace(/^images\//, '').replace(/^\/images\//, '');
+}
+
+function getGalleryImages(currentProperty) {
+  const images = [];
+  const pushIfNew = function (value) {
+    const resolved = resolveImageSrc(value);
+    if (!images.includes(resolved)) {
+      images.push(resolved);
+    }
+  };
+
+  if (currentProperty.imagen_principal) {
+    pushIfNew(currentProperty.imagen_principal);
+  }
+
+  if (currentProperty.images && currentProperty.images.length > 0) {
+    currentProperty.images
+      .slice()
+      .sort(function (a, b) { return Number(a.orden || 0) - Number(b.orden || 0); })
+      .forEach(function (image) {
+        pushIfNew(image.url);
+      });
+  }
+
+  if (images.length === 0) {
+    pushIfNew(currentProperty.imagen);
+  }
+
+  if (images.length === 0) {
+    pushIfNew(null);
+  }
+
+  return images;
+}
+
+function formatPropertyType(value) {
+  const normalized = String(value || 'Propiedad').replace(/_/g, ' ').trim().toLowerCase();
+  if (!normalized) return 'Propiedad';
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+const galleryImages = getGalleryImages(property);
+const mapPrimaryQuery = property.direccion ? String(property.direccion).trim() : '';
+const mapFallbackQuery = property.ubicacion ? String(property.ubicacion).trim() : '';
+const mapDisplayLabel = mapPrimaryQuery || mapFallbackQuery;
+%>
+
+<section class="property-hero">
+  <div class="detail-gallery" data-gallery-images='<%- JSON.stringify(galleryImages) %>'>
+    <img
+      src="<%= galleryImages[0] %>"
+      alt="<%= property.titulo %>"
+      class="detail-image"
+      id="detail-main-image"
+    />
+
+    <% if (galleryImages.length > 1) { %>
+      <button type="button" class="gallery-arrow gallery-prev" id="gallery-prev" aria-label="Imagen anterior">&#10094;</button>
+      <button type="button" class="gallery-arrow gallery-next" id="gallery-next" aria-label="Imagen siguiente">&#10095;</button>
+      <div class="gallery-counter" id="gallery-counter">1 / <%= galleryImages.length %></div>
+    <% } %>
+  </div>
+
+  <% if (galleryImages.length > 1) { %>
+    <div class="gallery-thumbs" id="gallery-thumbs">
+      <% galleryImages.forEach(function(imageSrc, index) { %>
+        <button
+          type="button"
+          class="gallery-thumb <%= index === 0 ? 'is-active' : '' %>"
+          data-gallery-index="<%= index %>"
+          aria-label="Ver imagen <%= index + 1 %>"
+        >
+          <img src="<%= imageSrc %>" alt="<%= property.titulo %> - imagen <%= index + 1 %>" />
+        </button>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<section class="property-page-grid">
+  <article class="property-main-card">
+    <div class="property-tags">
+      <span class="badge badge-dark"><%= property.operacion === 'alquiler' ? 'Alquiler' : 'Venta' %></span>
+      <span class="badge badge-light inline-badge"><%= formatPropertyType(property.tipo) %></span>
+    </div>
+
+    <h1 class="property-title"><%= property.titulo %></h1>
+    <p class="location location-line property-address-line">
+      <span class="mini-svg" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+          <path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z"></path>
+          <circle cx="12" cy="11" r="2.3"></circle>
+        </svg>
+      </span>
+      <%= property.ubicacion %>
+    </p>
+
+    <% if (property.direccion) { %>
+      <p class="property-street"><%= property.direccion %></p>
+    <% } %>
+
+    <p class="property-price">USD <%= Number(property.precio).toLocaleString('es-AR') %></p>
+
+    <div class="property-metrics">
+      <div class="metric-card">
+        <span class="metric-label">Dormitorios</span>
+        <strong><%= property.dormitorios || '-' %></strong>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Baños</span>
+        <strong><%= property.banios || '-' %></strong>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label"><%= property.tipo === 'departamento' ? 'Piso' : 'Plantas' %></span>
+        <strong><%= property.tipo === 'departamento' ? (property.piso || '-') : (property.plantas || '-') %></strong>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Cubierta</span>
+        <strong><%= property.superficie_cubierta_m2 || '-' %> m2</strong>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Total</span>
+        <strong><%= property.superficie_total_m2 || property.superficie_m2 || '-' %> m2</strong>
+      </div>
+    </div>
+
+    <section class="property-description collapsible-card">
+      <button
+        type="button"
+        class="collapse-toggle"
+        data-collapse-target="property-description-panel"
+        aria-expanded="true"
+      >
+        <span>Descripcion</span>
+        <span class="collapse-icon">▾</span>
+      </button>
+      <div id="property-description-panel" class="collapse-panel">
+        <p><%= property.descripcion || 'Sin descripcion cargada.' %></p>
+      </div>
+    </section>
+
+    <section class="property-map-box collapsible-card">
+      <button
+        type="button"
+        class="collapse-toggle"
+        data-collapse-target="property-map-panel"
+        aria-expanded="true"
+      >
+        <span>Ubicacion</span>
+        <span class="collapse-icon">▾</span>
+      </button>
+      <div id="property-map-panel" class="collapse-panel">
+        <p class="location">
+          <%= mapDisplayLabel || 'No hay direccion cargada para esta propiedad.' %>
+          <% if (mapPrimaryQuery && mapFallbackQuery) { %>
+            <br />
+            <small><%= mapFallbackQuery %></small>
+          <% } %>
+        </p>
+        <div
+          id="property-map"
+          class="property-map"
+          data-query="<%= mapPrimaryQuery %>"
+          data-fallback-query="<%= mapFallbackQuery %>"
+        ></div>
+        <p id="property-map-status" class="map-status"></p>
+      </div>
+    </section>
+  </article>
+
+  <aside class="property-side-column">
+    <section class="contact-box property-contact-card">
+      <h2>Contactar</h2>
+      <p>Dejanos tus datos y preparamos el mail automaticamente.</p>
+
+      <% if (successMessage) { %>
+        <p class="success"><%= successMessage %></p>
+      <% } %>
+
+      <% if (mailtoLink) { %>
+        <a class="btn" href="<%= mailtoLink %>">Abrir cliente de mail</a>
+      <% } %>
+
+      <form action="/propiedades/<%= property.id %>/contacto" method="post" class="contact-form">
+        <label for="nombre">Nombre completo</label>
+        <input id="nombre" name="nombre" type="text" required placeholder="Juan Perez" />
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required placeholder="juan@ejemplo.com" />
+
+        <label for="telefono">Telefono</label>
+        <input id="telefono" name="telefono" type="text" placeholder="+54 11 1234-5678" />
+
+        <label for="mensaje">Mensaje</label>
+        <textarea id="mensaje" name="mensaje" rows="4">Hola, me interesa <%= property.titulo %> (USD <%= Number(property.precio).toLocaleString('es-AR') %>). Me gustaría recibir más información.</textarea>
+
+        <button type="submit" class="btn btn-dark">Enviar consulta</button>
+      </form>
+    </section>
+
+    <section class="contact-box property-contact-info collapsible-card">
+      <button
+        type="button"
+        class="collapse-toggle"
+        data-collapse-target="property-contact-info-panel"
+        aria-expanded="false"
+      >
+        <span>Contacto directo</span>
+        <span class="collapse-icon">▾</span>
+      </button>
+      <div id="property-contact-info-panel" class="collapse-panel is-collapsed">
+        <p><strong>Telefono:</strong> +54 11 1234-5678</p>
+        <p><strong>Email:</strong> info@brunpropiedades.com</p>
+        <p><strong>WhatsApp:</strong> +54 11 1234-5678</p>
+      </div>
+    </section>
+  </aside>
+</section>
+
+<script>
+  (function () {
+    const wrapper = document.querySelector('.detail-gallery');
+    if (!wrapper) return;
+
+    let images = [];
+    try {
+      images = JSON.parse(wrapper.getAttribute('data-gallery-images') || '[]');
+    } catch (error) {
+      images = [];
+    }
+
+    const imageEl = document.getElementById('detail-main-image');
+    const prevBtn = document.getElementById('gallery-prev');
+    const nextBtn = document.getElementById('gallery-next');
+    const counterEl = document.getElementById('gallery-counter');
+    const thumbButtons = Array.from(document.querySelectorAll('[data-gallery-index]'));
+    let currentIndex = 0;
+
+    if (!Array.isArray(images) || images.length === 0 || !imageEl) return;
+
+    function setActiveThumb(index) {
+      thumbButtons.forEach(function (btn) {
+        const btnIndex = Number(btn.getAttribute('data-gallery-index'));
+        btn.classList.toggle('is-active', btnIndex === index);
+      });
+    }
+
+    function renderImage() {
+      imageEl.src = images[currentIndex];
+      if (counterEl) {
+        counterEl.textContent = (currentIndex + 1) + ' / ' + images.length;
+      }
+      setActiveThumb(currentIndex);
+    }
+
+    if (prevBtn && nextBtn && images.length > 1) {
+      prevBtn.addEventListener('click', function () {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        renderImage();
+      });
+
+      nextBtn.addEventListener('click', function () {
+        currentIndex = (currentIndex + 1) % images.length;
+        renderImage();
+      });
+    }
+
+    thumbButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        currentIndex = Number(btn.getAttribute('data-gallery-index'));
+        renderImage();
+      });
+    });
+  })();
+
+  (function () {
+    const mapEl = document.getElementById('property-map');
+    const statusEl = document.getElementById('property-map-status');
+    if (!mapEl) return;
+
+    const primaryQuery = (mapEl.getAttribute('data-query') || '').trim();
+    const fallbackQuery = (mapEl.getAttribute('data-fallback-query') || '').trim();
+    const queries = [primaryQuery, fallbackQuery].filter(Boolean);
+
+    if (queries.length === 0) {
+      if (statusEl) statusEl.textContent = 'Carga una direccion para mostrar el mapa.';
+      return;
+    }
+
+    function setStatus(text) {
+      if (statusEl) statusEl.textContent = text;
+    }
+
+    function loadLeaflet() {
+      return new Promise(function (resolve, reject) {
+        if (window.L) {
+          resolve();
+          return;
+        }
+
+        if (!document.querySelector('link[data-leaflet-css]')) {
+          const css = document.createElement('link');
+          css.rel = 'stylesheet';
+          css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          css.setAttribute('data-leaflet-css', 'true');
+          document.head.appendChild(css);
+        }
+
+        const existingScript = document.querySelector('script[data-leaflet-js]');
+        if (existingScript) {
+          existingScript.addEventListener('load', resolve);
+          existingScript.addEventListener('error', reject);
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.defer = true;
+        script.setAttribute('data-leaflet-js', 'true');
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+    }
+
+    function geocode(query) {
+      return fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(query))
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (results) {
+          if (!Array.isArray(results) || results.length === 0) return null;
+          return {
+            lat: Number(results[0].lat),
+            lon: Number(results[0].lon),
+            label: query
+          };
+        });
+    }
+
+    setStatus('Buscando ubicacion...');
+
+    loadLeaflet()
+      .then(function () {
+        return geocode(queries[0]).then(function (firstResult) {
+          if (firstResult) return firstResult;
+          if (queries.length > 1 && queries[1] !== queries[0]) {
+            return geocode(queries[1]);
+          }
+          return null;
+        });
+      })
+      .then(function (result) {
+        if (!result) {
+          setStatus('No pudimos ubicar esta direccion en el mapa.');
+          return;
+        }
+
+        const map = L.map(mapEl).setView([result.lat, result.lon], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        L.marker([result.lat, result.lon]).addTo(map).bindPopup(result.label);
+        setStatus('');
+      })
+      .catch(function () {
+        setStatus('No se pudo cargar el mapa en este momento.');
+      });
+  })();
+
+  (function () {
+    const toggles = document.querySelectorAll('[data-collapse-target]');
+    toggles.forEach(function (toggleBtn) {
+      const targetId = toggleBtn.getAttribute('data-collapse-target');
+      const panel = document.getElementById(targetId);
+      if (!panel) return;
+
+      function applyState(expanded) {
+        toggleBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        panel.classList.toggle('is-collapsed', !expanded);
+      }
+
+      applyState(!panel.classList.contains('is-collapsed'));
+
+      toggleBtn.addEventListener('click', function () {
+        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        applyState(!expanded);
+      });
+    });
+  })();
+</script>
+
+<%- include('../partials/footer') %>
