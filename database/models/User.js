@@ -15,7 +15,7 @@ module.exports = function (sequelize, dataTypes) {
     },
     contrasena: {
       type: dataTypes.STRING,
-      field: 'contraseña'
+      field: 'contrasena'
     },
     rol: {
       type: dataTypes.ENUM('admin', 'user')
