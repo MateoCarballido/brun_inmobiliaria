@@ -8,6 +8,8 @@
   <% } %>
 
   <form action="/users/login" method="post" class="contact-form">
+    <input type="hidden" name="next" value="<%= next || formData.next || '' %>" />
+
     <label for="email">Email</label>
     <input id="email" name="email" type="email" required value="<%= formData.email || '' %>" />
 
@@ -17,7 +19,7 @@
     <button type="submit" class="btn">Ingresar</button>
   </form>
 
-  <p>Si no tenes cuenta, <a class="link" href="/users/register">registrate aca</a>.</p>
+  <p>Si no tenes cuenta, <a class="link" href="/users/register<%= (next || formData.next) ? ('?next=' + encodeURIComponent(next || formData.next)) : '' %>">registrate aca</a>.</p>
 </section>
 
 <%- include('../partials/footer') %>

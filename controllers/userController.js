@@ -53,29 +53,40 @@ async function verifyPassword(plainPassword, storedPassword) {
 }
 
 function renderLogin(req, res) {
+  const next = req.query.next ? String(req.query.next).trim() : '';
+
   return res.render('users/login', {
     title: 'Iniciar sesion',
     errorMessage: null,
-    formData: {}
+    formData: { next },
+    next
   });
 }
 
 function renderRegister(req, res) {
+  const next = req.query.next ? String(req.query.next).trim() : '';
+  const required = req.query.required ? String(req.query.required).trim() : '';
+
   return res.render('users/register', {
     title: 'Crear cuenta',
     errorMessage: null,
-    formData: {}
+    formData: { next },
+    next,
+    required
   });
 }
 
 async function register(req, res) {
-  const { username, email, password } = req.body;
+  const { username, email, password, next } = req.body;
+  const safeNext = typeof next === 'string' && next.startsWith('/') ? next : '';
 
   if (!username || !email || !password) {
     return res.status(400).render('users/register', {
       title: 'Crear cuenta',
       errorMessage: 'Username, email y contrasena son obligatorios.',
-      formData: req.body
+      formData: req.body,
+      next: safeNext,
+      required: ''
     });
   }
 
@@ -87,7 +98,9 @@ async function register(req, res) {
       return res.status(400).render('users/register', {
         title: 'Crear cuenta',
         errorMessage: 'Ya existe un usuario con ese email.',
-        formData: req.body
+        formData: req.body,
+        next: safeNext,
+        required: ''
       });
     }
 
@@ -95,7 +108,9 @@ async function register(req, res) {
       return res.status(400).render('users/register', {
         title: 'Crear cuenta',
         errorMessage: 'Ese username ya esta en uso.',
-        formData: req.body
+        formData: req.body,
+        next: safeNext,
+        required: ''
       });
     }
 
@@ -108,18 +123,21 @@ async function register(req, res) {
       rol: 'user'
     });
 
-    return res.redirect('/users/login');
+    return res.redirect(safeNext ? `/users/login?next=${encodeURIComponent(safeNext)}` : '/users/login');
   } catch (error) {
     return res.status(500).render('users/register', {
       title: 'Crear cuenta',
       errorMessage: 'No se pudo crear el usuario. Revisa los datos.',
-      formData: req.body
+      formData: req.body,
+      next: safeNext,
+      required: ''
     });
   }
 }
 
 async function login(req, res) {
-  const { email, password } = req.body;
+  const { email, password, next } = req.body;
+  const safeNext = typeof next === 'string' && next.startsWith('/') ? next : '';
 
   try {
     const user = await db.User.findOne({ where: { email } });
@@ -130,7 +148,8 @@ async function login(req, res) {
       return res.status(401).render('users/login', {
         title: 'Iniciar sesion',
         errorMessage: 'Credenciales invalidas.',
-        formData: req.body
+        formData: req.body,
+        next: safeNext
       });
     }
 
@@ -158,12 +177,13 @@ async function login(req, res) {
       signed: true
     });
 
-    return res.redirect('/');
+    return res.redirect(safeNext || '/');
   } catch (error) {
     return res.status(500).render('users/login', {
       title: 'Iniciar sesion',
       errorMessage: 'No se pudo iniciar sesion.',
-      formData: req.body
+      formData: req.body,
+      next: safeNext
     });
   }
 }

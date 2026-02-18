@@ -43,10 +43,15 @@ function renderAbout(req, res) {
 }
 
 function renderContact(req, res) {
+  const authNotice = req.query.required === 'consulta'
+    ? 'Para enviar una consulta tenes que crear una cuenta o iniciar sesion.'
+    : null;
+
   res.render('contact', {
     title: 'Contacto',
     pageClass: '',
-    successMessage: null
+    successMessage: null,
+    authNotice
   });
 }
 
@@ -91,7 +96,8 @@ async function submitContact(req, res) {
   return res.render('contact', {
     title: 'Contacto',
     pageClass: '',
-    successMessage: 'Gracias por tu mensaje. Te responderemos a la brevedad.'
+    successMessage: 'Gracias por tu mensaje. Te responderemos a la brevedad.',
+    authNotice: null
   });
 }
 

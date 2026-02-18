@@ -3,11 +3,17 @@
 <section class="contact-box auth-box">
   <h1>Crear cuenta</h1>
 
+  <% if (required === 'consulta') { %>
+    <p class="notice">Para enviar consultas, primero crea tu cuenta.</p>
+  <% } %>
+
   <% if (errorMessage) { %>
     <p class="error"><%= errorMessage %></p>
   <% } %>
 
   <form action="/users/register" method="post" class="contact-form">
+    <input type="hidden" name="next" value="<%= next || formData.next || '' %>" />
+
     <label for="username">Username</label>
     <input id="username" name="username" type="text" required value="<%= formData.username || '' %>" />
 
@@ -20,7 +26,7 @@
     <button type="submit" class="btn">Crear usuario</button>
   </form>
 
-  <p>Si ya tenes cuenta, <a class="link" href="/users/login">inicia sesion</a>.</p>
+  <p>Si ya tenes cuenta, <a class="link" href="/users/login<%= (next || formData.next) ? ('?next=' + encodeURIComponent(next || formData.next)) : '' %>">inicia sesion</a>.</p>
 </section>
 
 <%- include('../partials/footer') %>

@@ -180,6 +180,10 @@ const mapDisplayLabel = mapPrimaryQuery || mapFallbackQuery;
       <h2>Contactar</h2>
       <p>Dejanos tus datos y preparamos el mail automaticamente.</p>
 
+      <% if (authNotice) { %>
+        <p class="notice"><%= authNotice %></p>
+      <% } %>
+
       <% if (successMessage) { %>
         <p class="success"><%= successMessage %></p>
       <% } %>

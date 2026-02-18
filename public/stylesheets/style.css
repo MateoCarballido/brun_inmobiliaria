@@ -1116,9 +1116,16 @@ select {
   padding: 0.7rem;
 }
 
+.notice {
+  background: #eef3ff;
+  border: 1px solid #c9d8ff;
+  border-radius: 8px;
+  padding: 0.7rem;
+}
+
 .site-footer {
-  border-top: 1px solid #e5e4e1;
-  background: var(--surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  background: #1d4a37;
   margin-top: 2.2rem;
 }
 
@@ -1138,13 +1145,14 @@ select {
 
 .footer-brand-block p {
   margin: 0;
-  color: #61666d;
+  color: #dce9e2;
   max-width: 290px;
 }
 
 .site-footer h4 {
   margin: 0 0 0.7rem;
   font-size: 1.18rem;
+  color: #ffffff;
 }
 
 .site-footer ul {
@@ -1156,13 +1164,13 @@ select {
 }
 
 .site-footer li {
-  color: #61666d;
+  color: #dce9e2;
   font-size: 0.9rem;
 }
 
 .site-footer a {
   text-decoration: none;
-  color: #61666d;
+  color: #f2f8f5;
   font-size: 0.9rem;
 }
 
@@ -1181,13 +1189,13 @@ select {
 .footer-socials a {
   width: 28px;
   height: 28px;
-  border: 1px solid #cfd3d8;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 0.82rem;
-  color: #5e646b;
+  color: #ffffff;
 }
 
 .legal-page {

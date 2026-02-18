@@ -1,6 +1,6 @@
 const express = require('express');
 const propertyController = require('../controllers/propertyController');
-const { requireAdmin } = require('../middlewares/authMiddleware');
+const { requireAdmin, requireAuthForConsultation } = require('../middlewares/authMiddleware');
 const { uploadPropertyImages } = require('../middlewares/propertyUploadMiddleware');
 
 const router = express.Router();
@@ -12,6 +12,6 @@ router.get('/:id/edit', requireAdmin, propertyController.renderEditProperty);
 router.post('/:id/edit', requireAdmin, uploadPropertyImages, propertyController.updateProperty);
 router.post('/:id/delete', requireAdmin, propertyController.deleteProperty);
 router.get('/:id', propertyController.renderPropertyDetail);
-router.post('/:id/contacto', propertyController.handleInterestEmail);
+router.post('/:id/contacto', requireAuthForConsultation, propertyController.handleInterestEmail);
 
 module.exports = router;

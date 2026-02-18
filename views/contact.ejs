@@ -53,6 +53,10 @@
   </aside>
 
   <section class="contact-form-card">
+    <% if (typeof authNotice !== 'undefined' && authNotice) { %>
+      <p class="notice"><%= authNotice %></p>
+    <% } %>
+
     <% if (typeof successMessage !== 'undefined' && successMessage) { %>
       <p class="success"><%= successMessage %></p>
     <% } %>

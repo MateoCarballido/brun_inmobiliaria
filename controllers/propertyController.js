@@ -269,11 +269,16 @@ async function renderPropertyDetail(req, res, next) {
     return next();
   }
 
+  const authNotice = req.query.required === 'consulta'
+    ? 'Para enviar una consulta sobre esta propiedad tenes que crear una cuenta o iniciar sesion.'
+    : null;
+
   return res.render('properties/show', {
     title: property.titulo,
     property,
     successMessage: null,
-    mailtoLink: null
+    mailtoLink: null,
+    authNotice
   });
 }
 
@@ -318,7 +323,8 @@ async function handleInterestEmail(req, res, next) {
     title: property.titulo,
     property,
     successMessage: 'Tu consulta esta lista. Hace click en "Abrir cliente de mail" para enviarla.',
-    mailtoLink
+    mailtoLink,
+    authNotice: null
   });
 }
 
