@@ -1149,6 +1149,16 @@ select {
   max-width: 290px;
 }
 
+.footer-wide-text {
+  grid-column: 1 / -1;
+  margin: 0.2rem 0 0;
+  color: #f2f8f5;
+  font-size: clamp(1.1rem, 2.9vw, 3.6rem);
+  line-height: 1.15;
+  font-weight: 700;
+  text-align: center;
+}
+
 .site-footer h4 {
   margin: 0 0 0.7rem;
   font-size: 1.18rem;
