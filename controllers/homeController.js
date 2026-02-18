@@ -29,7 +29,7 @@ async function renderHome(req, res) {
   const featuredProperties = await getFeaturedProperties();
 
   res.render('home', {
-    title: 'Inmobiliaria Horizonte',
+    title: 'Brun Inmobiliaria',
     featuredProperties,
     pageClass: 'landing-page'
   });
