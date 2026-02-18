@@ -48,7 +48,7 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
       <p class="error"><%= errorMessage %></p>
     <% } %>
 
-    <form action="/propiedades/add" method="post" class="contact-form">
+    <form action="/propiedades/add" method="post" enctype="multipart/form-data" class="contact-form">
       <label for="titulo">Titulo</label>
       <p class="field-help">Ejemplo: Casa 4 ambientes con jardin en Palermo.</p>
       <input id="titulo" name="titulo" type="text" required placeholder="Casa 4 ambientes con jardin en Palermo" value="<%= formData.titulo || '' %>" />
@@ -94,10 +94,19 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
       <p class="field-help">Ejemplo: Av. Santa Fe 1234.</p>
       <input id="direccion" name="direccion" type="text" placeholder="Av. Santa Fe 1234" value="<%= formData.direccion || '' %>" />
 
-      <label for="imagen_principal">Imagen principal (nombre de archivo)</label>
+      <label for="imagen_principal_file">Imagen principal (archivo)</label>
+      <p class="field-help">Subi JPG, PNG o WEBP (max. 5MB). Se guarda en Cloudinary.</p>
+      <input id="imagen_principal_file" name="imagen_principal_file" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" />
+
+      <label for="imagen_principal">Imagen principal (opcional por nombre/URL)</label>
+      <p class="field-help">Solo si no subis archivo. Ejemplo: casa-palermo-01.jpg o URL completa.</p>
       <input id="imagen_principal" name="imagen_principal" type="text" placeholder="casa-palermo-01.jpg" value="<%= formData.imagen_principal || '' %>" />
 
-      <label for="imagenes_extra">Imagenes extra (una por linea)</label>
+      <label for="imagenes_extra_files">Imagenes extra (archivos)</label>
+      <p class="field-help">Podes seleccionar varias juntas. Se guardan en Cloudinary.</p>
+      <input id="imagenes_extra_files" name="imagenes_extra_files" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" multiple />
+
+      <label for="imagenes_extra">Imagenes extra (opcional por nombre/URL, una por linea)</label>
       <textarea id="imagenes_extra" name="imagenes_extra" rows="3" placeholder="casa-palermo-02.jpg&#10;casa-palermo-03.jpg"><%= formData.imagenes_extra || '' %></textarea>
 
       <div class="form-split">

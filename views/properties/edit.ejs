@@ -8,7 +8,7 @@
     <p class="error"><%= errorMessage %></p>
   <% } %>
 
-  <form action="/propiedades/<%= propertyId %>/edit" method="post" class="contact-form">
+  <form action="/propiedades/<%= propertyId %>/edit" method="post" enctype="multipart/form-data" class="contact-form">
     <label for="titulo">Titulo</label>
     <input id="titulo" name="titulo" type="text" required value="<%= formData.titulo || '' %>" />
 
@@ -49,10 +49,18 @@
     <label for="direccion">Direccion (calle y numero)</label>
     <input id="direccion" name="direccion" type="text" value="<%= formData.direccion || '' %>" />
 
-    <label for="imagen_principal">Imagen principal (nombre de archivo)</label>
+    <label for="imagen_principal_file">Imagen principal (archivo)</label>
+    <p class="field-help">Si subis una nueva, reemplaza la principal actual.</p>
+    <input id="imagen_principal_file" name="imagen_principal_file" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" />
+
+    <label for="imagen_principal">Imagen principal (opcional por nombre/URL)</label>
     <input id="imagen_principal" name="imagen_principal" type="text" value="<%= formData.imagen_principal || '' %>" />
 
-    <label for="imagenes_extra">Imagenes extra (una por linea)</label>
+    <label for="imagenes_extra_files">Imagenes extra (archivos)</label>
+    <p class="field-help">Si cargas nuevas, se reemplaza la lista de imagenes extra.</p>
+    <input id="imagenes_extra_files" name="imagenes_extra_files" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" multiple />
+
+    <label for="imagenes_extra">Imagenes extra (opcional por nombre/URL, una por linea)</label>
     <textarea id="imagenes_extra" name="imagenes_extra" rows="3"><%= formData.imagenes_extra || '' %></textarea>
 
     <div class="form-split">

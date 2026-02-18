@@ -12,36 +12,57 @@ function normalizeImageReference(value) {
     return null;
   }
 
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
   const withoutQuery = trimmed.split('?')[0].split('#')[0];
   const parts = withoutQuery.split('/').filter(Boolean);
   return parts.length > 0 ? parts[parts.length - 1] : null;
 }
 
-function buildImageRows(propertyId, normalizedMainImage, rawExtraImages) {
-  const imageRows = [];
+function extractUploadedImageReference(file) {
+  if (!file) {
+    return null;
+  }
 
-  if (normalizedMainImage) {
+  return normalizeImageReference(file.path || file.filename || file.originalname);
+}
+
+function buildImageRows(propertyId, normalizedMainImage, rawExtraImages, uploadedExtraImageRefs) {
+  const seen = new Set();
+  const imageRows = [];
+  const addRow = function(url, orden) {
+    if (!url || seen.has(url)) {
+      return;
+    }
+    seen.add(url);
     imageRows.push({
       id_propiedad: propertyId,
-      url: normalizedMainImage,
-      orden: 0
+      url,
+      orden
     });
+  };
+
+  if (normalizedMainImage) {
+    addRow(normalizedMainImage, 0);
   }
 
-  if (rawExtraImages) {
-    const extraUrls = rawExtraImages
+  const manualExtraUrls = rawExtraImages
+    ? rawExtraImages
       .split('\n')
       .map((line) => normalizeImageReference(line))
-      .filter(Boolean);
+      .filter(Boolean)
+    : [];
 
-    extraUrls.forEach((url, index) => {
-      imageRows.push({
-        id_propiedad: propertyId,
-        url,
-        orden: index + 1
-      });
-    });
-  }
+  const allExtraUrls = [
+    ...manualExtraUrls,
+    ...(uploadedExtraImageRefs || [])
+  ];
+
+  allExtraUrls.forEach((url, index) => {
+    addRow(url, index + 1);
+  });
 
   return imageRows;
 }
@@ -350,7 +371,14 @@ async function createProperty(req, res) {
   }
 
   try {
-    const normalizedMainImage = normalizeImageReference(imagen_principal);
+    const uploadedMainImage = req.files && req.files.imagen_principal_file
+      ? req.files.imagen_principal_file[0]
+      : null;
+    const uploadedMainImageRef = extractUploadedImageReference(uploadedMainImage);
+    const normalizedMainImage = uploadedMainImageRef || normalizeImageReference(imagen_principal);
+    const uploadedExtraImageRefs = req.files && req.files.imagenes_extra_files
+      ? req.files.imagenes_extra_files.map(extractUploadedImageReference).filter(Boolean)
+      : [];
     const pisoValue = tipo === 'departamento' ? (piso || null) : null;
     const plantasValue = tipo === 'casa' ? (plantas || null) : null;
 
@@ -374,7 +402,7 @@ async function createProperty(req, res) {
       destacada: req.body.destacada === 'on'
     });
 
-    const imageRows = buildImageRows(createdProperty.id, normalizedMainImage, imagenes_extra);
+    const imageRows = buildImageRows(createdProperty.id, normalizedMainImage, imagenes_extra, uploadedExtraImageRefs);
 
     if (imageRows.length > 0) {
       await db.PropertyImage.bulkCreate(imageRows);
@@ -444,7 +472,14 @@ async function updateProperty(req, res, next) {
   }
 
   try {
-    const normalizedMainImage = normalizeImageReference(imagen_principal);
+    const uploadedMainImage = req.files && req.files.imagen_principal_file
+      ? req.files.imagen_principal_file[0]
+      : null;
+    const uploadedMainImageRef = extractUploadedImageReference(uploadedMainImage);
+    const normalizedMainImage = uploadedMainImageRef || normalizeImageReference(imagen_principal);
+    const uploadedExtraImageRefs = req.files && req.files.imagenes_extra_files
+      ? req.files.imagenes_extra_files.map(extractUploadedImageReference).filter(Boolean)
+      : [];
     const pisoValue = tipo === 'departamento' ? (piso || null) : null;
     const plantasValue = tipo === 'casa' ? (plantas || null) : null;
 
@@ -473,7 +508,7 @@ async function updateProperty(req, res, next) {
       }
     });
 
-    const imageRows = buildImageRows(property.id, normalizedMainImage, imagenes_extra);
+    const imageRows = buildImageRows(property.id, normalizedMainImage, imagenes_extra, uploadedExtraImageRefs);
     if (imageRows.length > 0) {
       await db.PropertyImage.bulkCreate(imageRows);
     }
