@@ -5,6 +5,19 @@ const BCRYPT_ROUNDS = 10;
 const isProduction = process.env.NODE_ENV === 'production';
 const forceSecureCookie = process.env.SESSION_SECURE === 'true';
 const sessionMaxAgeMs = Number(process.env.SESSION_MAX_AGE_MS || 1000 * 60 * 60 * 24 * 7);
+const ADMIN_EMAILS = new Set([
+  'moreyasoc@gmail.com',
+  'propiedadesbrun@gmail.com',
+  'martinabrun@live.com.ar'
+]);
+
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function isAdminEmail(email) {
+  return ADMIN_EMAILS.has(normalizeEmail(email));
+}
 
 function isBcryptHash(value) {
   return typeof value === 'string' && /^\$2[aby]\$\d{2}\$/.test(value);
@@ -79,8 +92,9 @@ function renderRegister(req, res) {
 async function register(req, res) {
   const { username, email, password, next } = req.body;
   const safeNext = typeof next === 'string' && next.startsWith('/') ? next : '';
+  const normalizedEmail = normalizeEmail(email);
 
-  if (!username || !email || !password) {
+  if (!username || !normalizedEmail || !password) {
     return res.status(400).render('users/register', {
       title: 'Crear cuenta',
       errorMessage: 'Username, email y contrasena son obligatorios.',
@@ -91,7 +105,7 @@ async function register(req, res) {
   }
 
   try {
-    const existingUserByEmail = await db.User.findOne({ where: { email } });
+    const existingUserByEmail = await db.User.findOne({ where: { email: normalizedEmail } });
     const existingUserByUsername = await db.User.findOne({ where: { username } });
 
     if (existingUserByEmail) {
@@ -118,9 +132,9 @@ async function register(req, res) {
 
     await db.User.create({
       username,
-      email,
+      email: normalizedEmail,
       contrasena: passwordHash,
-      rol: 'user'
+      rol: isAdminEmail(normalizedEmail) ? 'admin' : 'user'
     });
 
     return res.redirect(safeNext ? `/users/login?next=${encodeURIComponent(safeNext)}` : '/users/login');
@@ -138,9 +152,10 @@ async function register(req, res) {
 async function login(req, res) {
   const { email, password, next } = req.body;
   const safeNext = typeof next === 'string' && next.startsWith('/') ? next : '';
+  const normalizedEmail = normalizeEmail(email);
 
   try {
-    const user = await db.User.findOne({ where: { email } });
+    const user = await db.User.findOne({ where: { email: normalizedEmail } });
 
     const isValidPassword = user && await verifyPassword(password, user.contrasena);
 
@@ -161,11 +176,20 @@ async function login(req, res) {
       );
     }
 
+    let effectiveRole = user.rol;
+    if (isAdminEmail(user.email) && user.rol !== 'admin') {
+      await db.User.update(
+        { rol: 'admin' },
+        { where: { id: user.id } }
+      );
+      effectiveRole = 'admin';
+    }
+
     const sessionUser = {
       id: user.id,
       username: user.username,
       email: user.email,
-      rol: user.rol
+      rol: effectiveRole
     };
 
     req.session.user = sessionUser;
