@@ -135,6 +135,23 @@ h3 {
   padding: 0.45rem 0.9rem;
 }
 
+.mail-contact-btn {
+  display: inline-block;
+  padding: 0.38rem 0.78rem;
+  border-radius: 999px;
+  background: var(--brun-green);
+  color: #f8fbf9;
+  text-decoration: none;
+  font-weight: 600;
+  line-height: 1.1;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.mail-contact-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
 .site-header-light {
   background: #ffffff;
   border-bottom: 1px solid var(--border);
