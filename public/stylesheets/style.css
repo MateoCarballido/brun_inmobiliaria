@@ -1178,14 +1178,16 @@ select {
   grid-column: 1 / -1;
   margin: 0.4rem 0 0;
   color: #f2f8f5;
-  font-size: clamp(1.15rem, 1.95vw, 2.1rem);
+  font-size: clamp(1.2rem, 2.1vw, 2.3rem);
   line-height: 1.2;
   font-weight: 700;
   text-align: center;
   white-space: normal;
-  max-width: 32ch;
-  margin-inline: auto;
-  text-wrap: balance;
+  max-width: 100%;
+}
+
+.footer-line-break {
+  display: block;
 }
 
 .site-footer h4 {
@@ -1211,12 +1213,11 @@ select {
   text-decoration: none;
   color: #f2f8f5;
   font-size: 0.9rem;
-  transition: color 180ms ease, opacity 180ms ease, border-color 180ms ease;
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .site-footer a:hover {
-  color: #d7efe3;
-  opacity: 1;
+  color: #ffffff;
 }
 
 .footer-contact-list li {
@@ -1226,13 +1227,25 @@ select {
 }
 
 .site-footer .mail-contact-btn {
+  display: inline-block;
+  padding: 0.08rem 0.28rem;
+  border-radius: 999px;
   color: #f2f8f5;
-  border-bottom-color: rgba(242, 248, 245, 0.65);
+  border-bottom-color: rgba(242, 248, 245, 0.55);
 }
 
 .site-footer .mail-contact-btn:hover {
-  color: #d7efe3;
-  border-bottom-color: rgba(215, 239, 227, 0.95);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border-bottom-color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.site-footer ul a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 2px;
 }
 
 .legal-page {
