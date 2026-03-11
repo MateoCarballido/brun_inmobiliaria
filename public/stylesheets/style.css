@@ -1223,18 +1223,12 @@ select {
 }
 
 .site-footer .mail-contact-btn {
-  display: inline-block;
-  padding: 0.08rem 0.28rem;
-  border-radius: 999px;
-  color: #f2f8f5;
-  border-bottom-color: rgba(242, 248, 245, 0.55);
-}
-
-.site-footer .mail-contact-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
-  border-bottom-color: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
+  display: inline;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  background: transparent;
+  border-bottom-color: transparent;
 }
 
 .site-footer ul a:hover {
