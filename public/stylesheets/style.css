@@ -1182,13 +1182,8 @@ select {
   line-height: 1.2;
   font-weight: 700;
   text-align: center;
-  white-space: nowrap;
-}
-
-@media (max-width: 1200px) {
-  .footer-wide-text {
-    white-space: normal;
-  }
+  white-space: normal;
+  max-width: 100%;
 }
 
 .site-footer h4 {
