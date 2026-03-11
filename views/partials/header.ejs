@@ -3,9 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
+    <% const seoData = (typeof seo !== 'undefined' && seo) ? seo : {}; %>
+    <title><%= seoData.title || title %></title>
+    <meta name="description" content="<%= seoData.description || 'Brun Propiedades, inmobiliaria en Buenos Aires.' %>" />
+    <meta name="robots" content="<%= seoData.robots || 'index,follow' %>" />
+    <link rel="canonical" href="<%= seoData.canonical || siteUrl %>" />
     <link rel="icon" type="image/png" href="/images/faviconBrun.png" />
     <meta name="theme-color" content="#1d4a37" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:site_name" content="Brun Propiedades" />
+    <meta property="og:title" content="<%= seoData.title || title %>" />
+    <meta property="og:description" content="<%= seoData.description || 'Brun Propiedades, inmobiliaria en Buenos Aires.' %>" />
+    <meta property="og:type" content="<%= seoData.ogType || 'website' %>" />
+    <meta property="og:url" content="<%= seoData.canonical || siteUrl %>" />
+    <meta property="og:image" content="<%= seoData.ogImage || (siteUrl + '/images/brun-logo.png') %>" />
+    <meta name="twitter:card" content="<%= seoData.twitterCard || 'summary_large_image' %>" />
+    <meta name="twitter:title" content="<%= seoData.title || title %>" />
+    <meta name="twitter:description" content="<%= seoData.description || 'Brun Propiedades, inmobiliaria en Buenos Aires.' %>" />
+    <meta name="twitter:image" content="<%= seoData.ogImage || (siteUrl + '/images/brun-logo.png') %>" />
+    <% if (seoData.structuredData) { %>
+      <script type="application/ld+json"><%- JSON.stringify(seoData.structuredData) %></script>
+    <% } %>
     <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
   <% const currentPageClass = (typeof pageClass !== 'undefined' && pageClass) ? pageClass : ''; %>

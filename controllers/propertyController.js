@@ -1,6 +1,7 @@
 const propertyModel = require('../models/propertyModel');
 const db = require('../database/models');
 const op = db.Sequelize.Op;
+const { buildAbsoluteUrl, buildSeo } = require('../lib/seo');
 
 function normalizeImageReference(value) {
   if (!value) {
@@ -256,9 +257,21 @@ async function renderProperties(req, res) {
   const properties = await getAllProperties(filters);
 
   res.render('properties/index', {
-    title: 'Propiedades disponibles',
+    title: 'Propiedades en venta y alquiler | Brun Propiedades',
     properties,
-    filtros: filters
+    filtros: filters,
+    seo: buildSeo({
+      siteUrl: res.locals.siteUrl,
+      canonicalPath: '/propiedades',
+      title: 'Propiedades en venta y alquiler | Brun Propiedades',
+      description: 'Explora propiedades en venta y alquiler publicadas por Brun Propiedades en Buenos Aires.',
+      structuredData: {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: 'Propiedades de Brun Propiedades',
+        url: buildAbsoluteUrl(res.locals.siteUrl, '/propiedades')
+      }
+    })
   });
 }
 
@@ -278,7 +291,37 @@ async function renderPropertyDetail(req, res, next) {
     property,
     successMessage: null,
     mailtoLink: null,
-    authNotice
+    authNotice,
+    seo: buildSeo({
+      siteUrl: res.locals.siteUrl,
+      canonicalPath: `/propiedades/${property.id}`,
+      title: `${property.titulo} | Brun Propiedades`,
+      description: property.descripcion
+        ? String(property.descripcion).replace(/\s+/g, ' ').trim().slice(0, 155)
+        : `${property.titulo} en ${property.ubicacion || 'Buenos Aires'} publicada por Brun Propiedades.`,
+      ogType: 'article',
+      structuredData: {
+        '@context': 'https://schema.org',
+        '@type': 'Residence',
+        name: property.titulo,
+        description: property.descripcion || undefined,
+        url: buildAbsoluteUrl(res.locals.siteUrl, `/propiedades/${property.id}`),
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: property.ubicacion || 'Buenos Aires',
+          streetAddress: property.direccion || undefined,
+          addressCountry: 'AR'
+        },
+        floorSize: property.superficie_total_m2 || property.superficie_m2
+          ? {
+            '@type': 'QuantitativeValue',
+            value: Number(property.superficie_total_m2 || property.superficie_m2),
+            unitCode: 'MTK'
+          }
+          : undefined,
+        numberOfRooms: property.dormitorios || undefined
+      }
+    })
   });
 }
 
@@ -324,7 +367,16 @@ async function handleInterestEmail(req, res, next) {
     property,
     successMessage: 'Tu consulta esta lista. Hace click en "Abrir cliente de mail" para enviarla.',
     mailtoLink,
-    authNotice: null
+    authNotice: null,
+    seo: buildSeo({
+      siteUrl: res.locals.siteUrl,
+      canonicalPath: `/propiedades/${property.id}`,
+      title: `${property.titulo} | Brun Propiedades`,
+      description: property.descripcion
+        ? String(property.descripcion).replace(/\s+/g, ' ').trim().slice(0, 155)
+        : `${property.titulo} en ${property.ubicacion || 'Buenos Aires'} publicada por Brun Propiedades.`,
+      ogType: 'article'
+    })
   });
 }
 

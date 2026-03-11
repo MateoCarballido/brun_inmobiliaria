@@ -7,6 +7,7 @@ var session = require('express-session');
 require('dotenv').config({ quiet: true });
 var db = require('./database/models');
 var SequelizeStore = require('connect-session-sequelize')(session.Store);
+var seoUtils = require('./lib/seo');
 
 var indexRouter = require('./routes/index');
 var propertiesRouter = require('./routes/properties');
@@ -46,6 +47,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(cookieSecret));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(function(req, res, next) {
+  var siteUrl = seoUtils.normalizeSiteUrl(process.env.SITE_URL);
+  res.locals.siteUrl = siteUrl;
+  res.locals.seo = seoUtils.buildSeo({
+    siteUrl: siteUrl,
+    canonicalPath: req.path,
+    title: 'Brun Propiedades',
+    description: 'Brun Propiedades, inmobiliaria en Buenos Aires con propiedades en venta y alquiler.'
+  });
+  return next();
+});
 
 app.use(function(req, res, next) {
   req.currentUser = null;
