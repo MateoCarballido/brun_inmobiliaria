@@ -1175,7 +1175,7 @@ select {
 }
 
 .footer-wide-text {
-  grid-column: 2 / -1;
+  grid-column: 1 / -1;
   margin: 0.4rem 0 0;
   color: #f2f8f5;
   font-size: clamp(1.2rem, 2.1vw, 2.3rem);
