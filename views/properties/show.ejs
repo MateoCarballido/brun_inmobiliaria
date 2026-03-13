@@ -51,12 +51,15 @@ const galleryImages = getGalleryImages(property);
 
 <section class="property-hero">
   <div class="detail-gallery" data-gallery-images='<%- JSON.stringify(galleryImages) %>'>
-    <img
-      src="<%= galleryImages[0] %>"
-      alt="<%= property.titulo %>"
-      class="detail-image"
-      id="detail-main-image"
-    />
+    <button type="button" class="detail-image-button" id="open-gallery-lightbox" aria-label="Ampliar imagen principal">
+      <img
+        src="<%= galleryImages[0] %>"
+        alt="<%= property.titulo %>"
+        class="detail-image"
+        id="detail-main-image"
+      />
+      <span class="detail-image-hint">Tocar para ampliar</span>
+    </button>
 
     <% if (galleryImages.length > 1) { %>
       <button type="button" class="gallery-arrow gallery-prev" id="gallery-prev" aria-label="Imagen anterior">&#10094;</button>
@@ -80,6 +83,11 @@ const galleryImages = getGalleryImages(property);
     </div>
   <% } %>
 </section>
+
+<div class="gallery-lightbox" id="gallery-lightbox" hidden>
+  <button type="button" class="gallery-lightbox-close" id="close-gallery-lightbox" aria-label="Cerrar imagen ampliada">&times;</button>
+  <img src="<%= galleryImages[0] %>" alt="<%= property.titulo %>" class="gallery-lightbox-image" id="gallery-lightbox-image" />
+</div>
 
 <section class="property-page-grid">
   <article class="property-main-card">
@@ -228,6 +236,10 @@ const galleryImages = getGalleryImages(property);
     const nextBtn = document.getElementById('gallery-next');
     const counterEl = document.getElementById('gallery-counter');
     const thumbButtons = Array.from(document.querySelectorAll('[data-gallery-index]'));
+    const lightboxEl = document.getElementById('gallery-lightbox');
+    const lightboxImageEl = document.getElementById('gallery-lightbox-image');
+    const openLightboxBtn = document.getElementById('open-gallery-lightbox');
+    const closeLightboxBtn = document.getElementById('close-gallery-lightbox');
     let currentIndex = 0;
 
     if (!Array.isArray(images) || images.length === 0 || !imageEl) return;
@@ -241,6 +253,9 @@ const galleryImages = getGalleryImages(property);
 
     function renderImage() {
       imageEl.src = images[currentIndex];
+      if (lightboxImageEl) {
+        lightboxImageEl.src = images[currentIndex];
+      }
       if (counterEl) {
         counterEl.textContent = (currentIndex + 1) + ' / ' + images.length;
       }
@@ -264,6 +279,40 @@ const galleryImages = getGalleryImages(property);
         currentIndex = Number(btn.getAttribute('data-gallery-index'));
         renderImage();
       });
+    });
+
+    function openLightbox() {
+      if (!lightboxEl) return;
+      lightboxEl.hidden = false;
+      document.body.classList.add('lightbox-open');
+    }
+
+    function closeLightbox() {
+      if (!lightboxEl) return;
+      lightboxEl.hidden = true;
+      document.body.classList.remove('lightbox-open');
+    }
+
+    if (openLightboxBtn) {
+      openLightboxBtn.addEventListener('click', openLightbox);
+    }
+
+    if (closeLightboxBtn) {
+      closeLightboxBtn.addEventListener('click', closeLightbox);
+    }
+
+    if (lightboxEl) {
+      lightboxEl.addEventListener('click', function (event) {
+        if (event.target === lightboxEl) {
+          closeLightbox();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && lightboxEl && !lightboxEl.hidden) {
+        closeLightbox();
+      }
     });
   })();
 
