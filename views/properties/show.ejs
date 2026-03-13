@@ -47,9 +47,6 @@ function formatPropertyType(value) {
 }
 
 const galleryImages = getGalleryImages(property);
-const mapPrimaryQuery = property.direccion ? String(property.direccion).trim() : '';
-const mapFallbackQuery = property.ubicacion ? String(property.ubicacion).trim() : '';
-const mapDisplayLabel = mapPrimaryQuery || mapFallbackQuery;
 %>
 
 <section class="property-hero">
@@ -146,33 +143,6 @@ const mapDisplayLabel = mapPrimaryQuery || mapFallbackQuery;
       </div>
     </section>
 
-    <section class="property-map-box collapsible-card">
-      <button
-        type="button"
-        class="collapse-toggle"
-        data-collapse-target="property-map-panel"
-        aria-expanded="true"
-      >
-        <span>Ubicacion</span>
-        <span class="collapse-icon">▾</span>
-      </button>
-      <div id="property-map-panel" class="collapse-panel">
-        <p class="location">
-          <%= mapDisplayLabel || 'No hay direccion cargada para esta propiedad.' %>
-          <% if (mapPrimaryQuery && mapFallbackQuery) { %>
-            <br />
-            <small><%= mapFallbackQuery %></small>
-          <% } %>
-        </p>
-        <div
-          id="property-map"
-          class="property-map"
-          data-query="<%= mapPrimaryQuery %>"
-          data-fallback-query="<%= mapFallbackQuery %>"
-        ></div>
-        <p id="property-map-status" class="map-status"></p>
-      </div>
-    </section>
   </article>
 
   <aside class="property-side-column">
@@ -200,7 +170,7 @@ const mapDisplayLabel = mapPrimaryQuery || mapFallbackQuery;
         <input id="email" name="email" type="email" required placeholder="juan@ejemplo.com" />
 
         <label for="telefono">Telefono</label>
-        <input id="telefono" name="telefono" type="text" placeholder="+54 9 11 6973 2004" />
+        <input id="telefono" name="telefono" type="text" placeholder="11.5839.9513" />
 
         <label for="mensaje">Mensaje</label>
         <textarea id="mensaje" name="mensaje" rows="4">Hola, me interesa <%= property.titulo %> (USD <%= Number(property.precio).toLocaleString('es-AR') %>). Me gustaría recibir más información.</textarea>
@@ -220,9 +190,10 @@ const mapDisplayLabel = mapPrimaryQuery || mapFallbackQuery;
         <span class="collapse-icon">▾</span>
       </button>
       <div id="property-contact-info-panel" class="collapse-panel is-collapsed">
-        <p><strong>Telefono:</strong> <a class="mail-contact-btn" href="https://wa.me/5491169732004" target="_blank" rel="noopener noreferrer">+54 9 11 6973 2004</a></p>
+        <p><strong>Pablo:</strong> <a class="mail-contact-btn" href="https://wa.me/5491158399513" target="_blank" rel="noopener noreferrer">11.5839.9513</a></p>
+        <p><strong>Martina:</strong> <a class="mail-contact-btn" href="https://wa.me/5491141630630" target="_blank" rel="noopener noreferrer">11.4163.0630</a></p>
+        <p><strong>Guillermo:</strong> <a class="mail-contact-btn" href="https://wa.me/5491150230639" target="_blank" rel="noopener noreferrer">11.5023.0639</a></p>
         <p><strong>Email:</strong> <a class="mail-contact-btn" href="https://mail.google.com/mail/?view=cm&fs=1&to=propiedadesbrun@gmail.com" target="_blank" rel="noopener noreferrer">propiedadesbrun@gmail.com</a></p>
-        <p><strong>WhatsApp:</strong> <a class="mail-contact-btn" href="https://wa.me/5491169732004" target="_blank" rel="noopener noreferrer">+54 9 11 6973 2004</a></p>
       </div>
     </section>
   </aside>
@@ -282,102 +253,6 @@ const mapDisplayLabel = mapPrimaryQuery || mapFallbackQuery;
         renderImage();
       });
     });
-  })();
-
-  (function () {
-    const mapEl = document.getElementById('property-map');
-    const statusEl = document.getElementById('property-map-status');
-    if (!mapEl) return;
-
-    const primaryQuery = (mapEl.getAttribute('data-query') || '').trim();
-    const fallbackQuery = (mapEl.getAttribute('data-fallback-query') || '').trim();
-    const queries = [primaryQuery, fallbackQuery].filter(Boolean);
-
-    if (queries.length === 0) {
-      if (statusEl) statusEl.textContent = 'Carga una direccion para mostrar el mapa.';
-      return;
-    }
-
-    function setStatus(text) {
-      if (statusEl) statusEl.textContent = text;
-    }
-
-    function loadLeaflet() {
-      return new Promise(function (resolve, reject) {
-        if (window.L) {
-          resolve();
-          return;
-        }
-
-        if (!document.querySelector('link[data-leaflet-css]')) {
-          const css = document.createElement('link');
-          css.rel = 'stylesheet';
-          css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-          css.setAttribute('data-leaflet-css', 'true');
-          document.head.appendChild(css);
-        }
-
-        const existingScript = document.querySelector('script[data-leaflet-js]');
-        if (existingScript) {
-          existingScript.addEventListener('load', resolve);
-          existingScript.addEventListener('error', reject);
-          return;
-        }
-
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.defer = true;
-        script.setAttribute('data-leaflet-js', 'true');
-        script.onload = resolve;
-        script.onerror = reject;
-        document.body.appendChild(script);
-      });
-    }
-
-    function geocode(query) {
-      return fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(query))
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (results) {
-          if (!Array.isArray(results) || results.length === 0) return null;
-          return {
-            lat: Number(results[0].lat),
-            lon: Number(results[0].lon),
-            label: query
-          };
-        });
-    }
-
-    setStatus('Buscando ubicacion...');
-
-    loadLeaflet()
-      .then(function () {
-        return geocode(queries[0]).then(function (firstResult) {
-          if (firstResult) return firstResult;
-          if (queries.length > 1 && queries[1] !== queries[0]) {
-            return geocode(queries[1]);
-          }
-          return null;
-        });
-      })
-      .then(function (result) {
-        if (!result) {
-          setStatus('No pudimos ubicar esta direccion en el mapa.');
-          return;
-        }
-
-        const map = L.map(mapEl).setView([result.lat, result.lon], 16);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-        L.marker([result.lat, result.lon]).addTo(map).bindPopup(result.label);
-        setStatus('');
-      })
-      .catch(function () {
-        setStatus('No se pudo cargar el mapa en este momento.');
-      });
   })();
 
   (function () {

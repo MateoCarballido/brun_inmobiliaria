@@ -45,7 +45,7 @@ async function renderHome(req, res) {
         name: 'Brun Propiedades',
         url: buildAbsoluteUrl(siteUrl, '/'),
         image: buildAbsoluteUrl(siteUrl, '/images/brun-logo.png'),
-        telephone: '+54 9 11 6973 2004',
+        telephone: '+54 9 11 5839 9513',
         email: 'propiedadesbrun@gmail.com',
         areaServed: 'Buenos Aires, Argentina'
       }

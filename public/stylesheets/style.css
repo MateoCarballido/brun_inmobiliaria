@@ -7,8 +7,8 @@
   --brun-green: #1D4A37;
   --accent: #1D4A37;
   --border: #e0ddd8;
-  --title-font: Georgia, "Times New Roman", serif;
-  --body-font: "Trebuchet MS", "Segoe UI", sans-serif;
+  --title-font: "Arial Unicode MS", Arial, sans-serif;
+  --body-font: "Arial Unicode MS", Arial, sans-serif;
 }
 
 * {
@@ -813,32 +813,6 @@ main {
   color: #5f6770;
 }
 
-.property-map-box {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 1rem;
-  margin-top: 1rem;
-}
-
-.property-map-box h2 {
-  margin: 0;
-}
-
-.property-map {
-  width: 100%;
-  height: 360px;
-  border-radius: 10px;
-  margin-top: 0.7rem;
-  border: 1px solid #e5e7eb;
-}
-
-.map-status {
-  margin: 0.55rem 0 0;
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
 .contact-box {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1304,88 +1278,16 @@ select {
   font-size: 1.45rem;
 }
 
-.about-history {
-  border-top: 1px solid #e8e6e3;
-  border-bottom: 1px solid #e8e6e3;
-  padding: 2rem 0;
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 1.6rem;
-  align-items: start;
+.about-copy {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 0 1.2rem;
 }
 
-.about-history-text h2,
-.about-values-head h2 {
-  margin-top: 0;
-  margin-bottom: 0.7rem;
-  font-size: clamp(2rem, 4vw, 3rem);
-}
-
-.about-history-text p {
+.about-copy p {
   color: #6f747b;
-  line-height: 1.55;
+  line-height: 1.7;
   margin: 0.95rem 0 0;
-}
-
-.about-history-media img {
-  width: 100%;
-  border-radius: 16px;
-  display: block;
-}
-
-.about-values {
-  padding: 2.2rem 0 1.2rem;
-}
-
-.about-values-head {
-  text-align: center;
-}
-
-.about-values-head p {
-  color: #7a7f85;
-  margin-top: 0;
-}
-
-.values-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1.2rem;
-}
-
-.value-card {
-  border: 1px solid #e2e3e6;
-  border-radius: 16px;
-  padding: 1.3rem 1rem;
-  text-align: center;
-  background: #fff;
-}
-
-.value-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 999px;
-  background: #f2f3f5;
-  color: #252a30;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.value-icon svg {
-  width: 24px;
-  height: 24px;
-}
-
-.value-card h3 {
-  margin: 0.85rem 0 0.4rem;
-  font-size: 1.7rem;
-}
-
-.value-card p {
-  margin: 0;
-  color: #70757c;
-  line-height: 1.45;
 }
 
 .contact-hero {
@@ -1522,13 +1424,6 @@ select {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .about-history {
-    grid-template-columns: 1fr;
-  }
-
-  .values-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 768px) {
@@ -1633,10 +1528,6 @@ select {
   .gallery-thumb {
     width: 82px;
     height: 60px;
-  }
-
-  .property-map {
-    height: 280px;
   }
 
   .form-split {
