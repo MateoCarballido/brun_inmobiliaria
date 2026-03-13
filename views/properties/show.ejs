@@ -51,7 +51,7 @@ const galleryImages = getGalleryImages(property);
 
 <section class="property-hero">
   <div class="detail-gallery" data-gallery-images='<%- JSON.stringify(galleryImages) %>'>
-    <button type="button" class="detail-image-button" id="open-gallery-lightbox" aria-label="Ampliar imagen principal">
+    <div class="detail-image-button" id="open-gallery-lightbox" role="button" tabindex="0" aria-label="Ampliar imagen principal">
       <img
         src="<%= galleryImages[0] %>"
         alt="<%= property.titulo %>"
@@ -59,7 +59,7 @@ const galleryImages = getGalleryImages(property);
         id="detail-main-image"
       />
       <span class="detail-image-hint">Tocar para ampliar</span>
-    </button>
+    </div>
 
     <% if (galleryImages.length > 1) { %>
       <button type="button" class="gallery-arrow gallery-prev" id="gallery-prev" aria-label="Imagen anterior">&#10094;</button>
@@ -85,8 +85,19 @@ const galleryImages = getGalleryImages(property);
 </section>
 
 <div class="gallery-lightbox" id="gallery-lightbox" hidden>
-  <button type="button" class="gallery-lightbox-close" id="close-gallery-lightbox" aria-label="Cerrar imagen ampliada">&times;</button>
-  <img src="<%= galleryImages[0] %>" alt="<%= property.titulo %>" class="gallery-lightbox-image" id="gallery-lightbox-image" />
+  <div class="gallery-lightbox-shell">
+    <div class="gallery-lightbox-toolbar">
+      <div class="gallery-lightbox-zoom-controls">
+        <button type="button" class="gallery-lightbox-action" id="zoom-out-lightbox" aria-label="Alejar imagen">-</button>
+        <button type="button" class="gallery-lightbox-action" id="reset-zoom-lightbox" aria-label="Restablecer zoom">100%</button>
+        <button type="button" class="gallery-lightbox-action" id="zoom-in-lightbox" aria-label="Acercar imagen">+</button>
+      </div>
+      <button type="button" class="gallery-lightbox-close" id="close-gallery-lightbox" aria-label="Cerrar imagen ampliada">&times;</button>
+    </div>
+    <div class="gallery-lightbox-stage" id="gallery-lightbox-stage">
+      <img src="<%= galleryImages[0] %>" alt="<%= property.titulo %>" class="gallery-lightbox-image" id="gallery-lightbox-image" />
+    </div>
+  </div>
 </div>
 
 <section class="property-page-grid">
@@ -240,9 +251,27 @@ const galleryImages = getGalleryImages(property);
     const lightboxImageEl = document.getElementById('gallery-lightbox-image');
     const openLightboxBtn = document.getElementById('open-gallery-lightbox');
     const closeLightboxBtn = document.getElementById('close-gallery-lightbox');
+    const zoomInBtn = document.getElementById('zoom-in-lightbox');
+    const zoomOutBtn = document.getElementById('zoom-out-lightbox');
+    const resetZoomBtn = document.getElementById('reset-zoom-lightbox');
+    const lightboxStageEl = document.getElementById('gallery-lightbox-stage');
     let currentIndex = 0;
+    let zoomLevel = 1;
+    const interactionGuardUntil = Date.now() + 700;
 
     if (!Array.isArray(images) || images.length === 0 || !imageEl) return;
+
+    function clampZoom(value) {
+      return Math.min(4, Math.max(1, value));
+    }
+
+    function updateZoom() {
+      if (!lightboxImageEl) return;
+      lightboxImageEl.style.transform = 'scale(' + zoomLevel + ')';
+      if (resetZoomBtn) {
+        resetZoomBtn.textContent = Math.round(zoomLevel * 100) + '%';
+      }
+    }
 
     function setActiveThumb(index) {
       thumbButtons.forEach(function (btn) {
@@ -282,7 +311,10 @@ const galleryImages = getGalleryImages(property);
     });
 
     function openLightbox() {
+      if (Date.now() < interactionGuardUntil) return;
       if (!lightboxEl) return;
+      zoomLevel = 1;
+      updateZoom();
       lightboxEl.hidden = false;
       document.body.classList.add('lightbox-open');
     }
@@ -295,10 +327,37 @@ const galleryImages = getGalleryImages(property);
 
     if (openLightboxBtn) {
       openLightboxBtn.addEventListener('click', openLightbox);
+      openLightboxBtn.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox();
+        }
+      });
     }
 
     if (closeLightboxBtn) {
       closeLightboxBtn.addEventListener('click', closeLightbox);
+    }
+
+    if (zoomInBtn) {
+      zoomInBtn.addEventListener('click', function () {
+        zoomLevel = clampZoom(zoomLevel + 0.25);
+        updateZoom();
+      });
+    }
+
+    if (zoomOutBtn) {
+      zoomOutBtn.addEventListener('click', function () {
+        zoomLevel = clampZoom(zoomLevel - 0.25);
+        updateZoom();
+      });
+    }
+
+    if (resetZoomBtn) {
+      resetZoomBtn.addEventListener('click', function () {
+        zoomLevel = 1;
+        updateZoom();
+      });
     }
 
     if (lightboxEl) {
@@ -309,11 +368,22 @@ const galleryImages = getGalleryImages(property);
       });
     }
 
+    if (lightboxStageEl) {
+      lightboxStageEl.addEventListener('wheel', function (event) {
+        if (lightboxEl.hidden) return;
+        event.preventDefault();
+        zoomLevel = clampZoom(zoomLevel + (event.deltaY < 0 ? 0.2 : -0.2));
+        updateZoom();
+      }, { passive: false });
+    }
+
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && lightboxEl && !lightboxEl.hidden) {
         closeLightbox();
       }
     });
+
+    updateZoom();
   })();
 
   (function () {
