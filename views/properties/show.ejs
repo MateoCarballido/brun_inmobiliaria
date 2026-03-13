@@ -83,6 +83,10 @@ const galleryImages = getGalleryImages(property);
 
 <section class="property-page-grid">
   <article class="property-main-card">
+    <div class="property-toolbar no-print">
+      <button type="button" class="btn btn-light property-print-btn" id="print-property-sheet">Imprimir ficha</button>
+    </div>
+
     <div class="property-tags">
       <span class="badge badge-dark"><%= property.operacion === 'alquiler' ? 'Alquiler' : 'Venta' %></span>
       <span class="badge badge-light inline-badge"><%= formatPropertyType(property.tipo) %></span>
@@ -141,6 +145,14 @@ const galleryImages = getGalleryImages(property);
       <div id="property-description-panel" class="collapse-panel">
         <p><%= property.descripcion || 'Sin descripcion cargada.' %></p>
       </div>
+    </section>
+
+    <section class="property-print-contact print-only">
+      <h2>Contacto</h2>
+      <p><strong>Pablo:</strong> 11.5839.9513</p>
+      <p><strong>Martina:</strong> 11.4163.0630</p>
+      <p><strong>Guillermo:</strong> 11.5023.0639</p>
+      <p><strong>Email:</strong> propiedadesbrun@gmail.com</p>
     </section>
 
   </article>
@@ -252,6 +264,15 @@ const galleryImages = getGalleryImages(property);
         currentIndex = Number(btn.getAttribute('data-gallery-index'));
         renderImage();
       });
+    });
+  })();
+
+  (function () {
+    const printBtn = document.getElementById('print-property-sheet');
+    if (!printBtn) return;
+
+    printBtn.addEventListener('click', function () {
+      window.print();
     });
   })();
 

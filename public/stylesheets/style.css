@@ -712,6 +712,18 @@ main {
   padding: 1.15rem;
 }
 
+.property-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.85rem;
+}
+
+.property-print-btn {
+  margin-top: 0;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+}
+
 .property-tags {
   display: flex;
   gap: 0.45rem;
@@ -777,6 +789,25 @@ main {
 
 .property-description {
   margin-top: 1rem;
+}
+
+.property-print-contact {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.property-print-contact h2 {
+  margin: 0 0 0.55rem;
+}
+
+.property-print-contact p {
+  margin: 0.25rem 0;
+  color: #5c646d;
+}
+
+.print-only {
+  display: none;
 }
 
 .property-description h2 {
@@ -1566,5 +1597,117 @@ select {
 
   .footer-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .site-header,
+  .site-footer,
+  .property-side-column,
+  .gallery-arrow,
+  .gallery-counter,
+  .gallery-thumbs,
+  .no-print,
+  .collapse-icon {
+    display: none !important;
+  }
+
+  main.container,
+  .container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  main {
+    padding: 0;
+  }
+
+  .property-hero {
+    margin-bottom: 0.5rem;
+  }
+
+  .detail-image {
+    height: 250px;
+    border-radius: 0;
+  }
+
+  .property-page-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .property-main-card {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .property-tags {
+    margin-bottom: 0.3rem;
+  }
+
+  .badge {
+    border: 1px solid #999;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  .property-price {
+    margin: 0.45rem 0 0.7rem;
+    font-size: 1.8rem;
+  }
+
+  .property-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .metric-card {
+    background: #fff;
+    border: 1px solid #bbb;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .collapsible-card {
+    margin-top: 0.7rem;
+    break-inside: avoid;
+  }
+
+  .collapse-toggle {
+    display: none;
+  }
+
+  .collapse-panel,
+  .collapse-panel.is-collapsed {
+    display: block !important;
+  }
+
+  .property-description {
+    margin-top: 0.7rem;
+  }
+
+  .property-description p,
+  .property-print-contact p,
+  .location,
+  .property-street {
+    color: #000;
+  }
+
+  .print-only {
+    display: block !important;
   }
 }
