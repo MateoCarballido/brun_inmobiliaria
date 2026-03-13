@@ -333,7 +333,7 @@ async function handleInterestEmail(req, res, next) {
   }
 
   const { nombre, email, telefono, mensaje } = req.body;
-  const recipient = 'ventas@inmobiliariahorizonte.com';
+  const recipient = 'propiedadesbrun@gmail.com';
   const subject = `Consulta por ${property.titulo}`;
   const bodyLines = [
     `Hola, me interesa la propiedad: ${property.titulo}.`,
@@ -346,7 +346,7 @@ async function handleInterestEmail(req, res, next) {
     mensaje || 'Sin mensaje adicional.'
   ];
 
-  const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+  const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
 
   try {
     await db.Consultation.create({
