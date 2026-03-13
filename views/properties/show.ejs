@@ -95,6 +95,10 @@ const galleryImages = getGalleryImages(property);
       <button type="button" class="gallery-lightbox-close" id="close-gallery-lightbox" aria-label="Cerrar imagen ampliada">&times;</button>
     </div>
     <div class="gallery-lightbox-stage" id="gallery-lightbox-stage">
+      <% if (galleryImages.length > 1) { %>
+        <button type="button" class="gallery-lightbox-nav gallery-lightbox-prev" id="gallery-lightbox-prev" aria-label="Imagen anterior">&#10094;</button>
+        <button type="button" class="gallery-lightbox-nav gallery-lightbox-next" id="gallery-lightbox-next" aria-label="Imagen siguiente">&#10095;</button>
+      <% } %>
       <img src="<%= galleryImages[0] %>" alt="<%= property.titulo %>" class="gallery-lightbox-image" id="gallery-lightbox-image" />
     </div>
   </div>
@@ -255,6 +259,8 @@ const galleryImages = getGalleryImages(property);
     const zoomOutBtn = document.getElementById('zoom-out-lightbox');
     const resetZoomBtn = document.getElementById('reset-zoom-lightbox');
     const lightboxStageEl = document.getElementById('gallery-lightbox-stage');
+    const lightboxPrevBtn = document.getElementById('gallery-lightbox-prev');
+    const lightboxNextBtn = document.getElementById('gallery-lightbox-next');
     let currentIndex = 0;
     let zoomLevel = 1;
     const interactionGuardUntil = Date.now() + 700;
@@ -298,6 +304,20 @@ const galleryImages = getGalleryImages(property);
       });
 
       nextBtn.addEventListener('click', function () {
+        currentIndex = (currentIndex + 1) % images.length;
+        renderImage();
+      });
+    }
+
+    if (lightboxPrevBtn && lightboxNextBtn && images.length > 1) {
+      lightboxPrevBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        renderImage();
+      });
+
+      lightboxNextBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
         currentIndex = (currentIndex + 1) % images.length;
         renderImage();
       });
@@ -380,6 +400,19 @@ const galleryImages = getGalleryImages(property);
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && lightboxEl && !lightboxEl.hidden) {
         closeLightbox();
+        return;
+      }
+
+      if (lightboxEl && !lightboxEl.hidden && images.length > 1) {
+        if (event.key === 'ArrowLeft') {
+          currentIndex = (currentIndex - 1 + images.length) % images.length;
+          renderImage();
+        }
+
+        if (event.key === 'ArrowRight') {
+          currentIndex = (currentIndex + 1) % images.length;
+          renderImage();
+        }
       }
     });
 
