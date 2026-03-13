@@ -736,6 +736,7 @@ main {
 }
 
 .gallery-lightbox-shell {
+  position: relative;
   width: min(1280px, 96vw);
   max-height: 92vh;
   display: flex;
@@ -744,6 +745,8 @@ main {
 }
 
 .gallery-lightbox-toolbar {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -775,6 +778,8 @@ main {
 }
 
 .gallery-lightbox-stage {
+  position: relative;
+  z-index: 1;
   flex: 1;
   overflow: auto;
   border-radius: 16px;
@@ -786,11 +791,10 @@ main {
 }
 
 .gallery-lightbox-image {
-  max-width: none;
-  max-height: none;
+  max-width: 100%;
+  max-height: calc(92vh - 140px);
   width: auto;
   height: auto;
-  min-width: min(1100px, 90vw);
   object-fit: contain;
   border-radius: 12px;
   background: #fff;
@@ -1678,7 +1682,7 @@ select {
   }
 
   .gallery-lightbox-image {
-    min-width: 100%;
+    max-height: calc(94vh - 120px);
   }
 
   .gallery-thumb {

@@ -362,7 +362,7 @@ const galleryImages = getGalleryImages(property);
 
     if (lightboxEl) {
       lightboxEl.addEventListener('click', function (event) {
-        if (event.target === lightboxEl) {
+        if (!event.target.closest('.gallery-lightbox-shell')) {
           closeLightbox();
         }
       });
