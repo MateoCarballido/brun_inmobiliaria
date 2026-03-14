@@ -103,7 +103,7 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
       <input id="imagen_principal" name="imagen_principal" type="text" placeholder="casa-palermo-01.jpg" value="<%= formData.imagen_principal || '' %>" />
 
       <label for="imagenes_extra_files">Imagenes extra (archivos)</label>
-      <p class="field-help">Podes seleccionar varias juntas. Se guardan en Cloudinary.</p>
+      <p class="field-help">Podes seleccionar varias juntas. Maximo 10 imagenes extra. Se guardan en Cloudinary.</p>
       <input id="imagenes_extra_files" name="imagenes_extra_files" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" multiple />
 
       <label for="imagenes_extra">Imagenes extra (opcional por nombre/URL, una por linea)</label>
@@ -218,6 +218,18 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
     const plantasHelp = document.getElementById('plantas-help');
     const pisoHelp = document.getElementById('piso-help');
     const rows = Array.from(document.querySelectorAll('#admin-properties-body tr'));
+    const extraImagesInput = document.getElementById('imagenes_extra_files');
+    const createForm = panel ? panel.querySelector('form') : null;
+    const maxExtraImages = 10;
+
+    function validateExtraImagesSelection() {
+      if (!extraImagesInput || !extraImagesInput.files) return true;
+      if (extraImagesInput.files.length <= maxExtraImages) return true;
+
+      alert('Podes subir hasta 10 imagenes extra.');
+      extraImagesInput.value = '';
+      return false;
+    }
 
     function syncFieldsByTipo() {
       if (!tipoSelect) return;
@@ -280,6 +292,18 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
     if (tipoSelect) {
       syncFieldsByTipo();
       tipoSelect.addEventListener('change', syncFieldsByTipo);
+    }
+
+    if (extraImagesInput) {
+      extraImagesInput.addEventListener('change', validateExtraImagesSelection);
+    }
+
+    if (createForm) {
+      createForm.addEventListener('submit', function (event) {
+        if (!validateExtraImagesSelection()) {
+          event.preventDefault();
+        }
+      });
     }
 
     if (searchInput && rows.length > 0) {

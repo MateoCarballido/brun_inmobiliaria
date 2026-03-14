@@ -2,6 +2,7 @@ const propertyModel = require('../models/propertyModel');
 const db = require('../database/models');
 const op = db.Sequelize.Op;
 const { buildAbsoluteUrl, buildSeo } = require('../lib/seo');
+const { MAX_EXTRA_IMAGES } = require('../middlewares/propertyUploadMiddleware');
 
 function normalizeImageReference(value) {
   if (!value) {
@@ -582,6 +583,47 @@ async function updateProperty(req, res, next) {
   }
 }
 
+async function handlePropertyFormError(err, req, res, next) {
+  if (!err) {
+    return next();
+  }
+
+  const isCreateRoute = req.method === 'POST' && req.path === '/add';
+  const isEditRoute = req.method === 'POST' && /\/\d+\/edit$/.test(req.path);
+
+  if (!isCreateRoute && !isEditRoute) {
+    return next(err);
+  }
+
+  const errorMessage = err.userMessage || err.message || `Podes subir hasta ${MAX_EXTRA_IMAGES} imagenes extra.`;
+
+  if (isCreateRoute) {
+    const adminProperties = await getAdminProperties();
+    return res.status(err.status || 400).render('properties/create', {
+      title: 'Publicar propiedad',
+      errorMessage,
+      adminMessage: null,
+      formData: req.body || {},
+      adminProperties
+    });
+  }
+
+  const property = await findPropertyForAdmin(req.params.id);
+  if (!property) {
+    return next(err);
+  }
+
+  return res.status(err.status || 400).render('properties/edit', {
+    title: `Editar: ${property.titulo}`,
+    errorMessage,
+    propertyId: property.id,
+    formData: {
+      ...buildEditFormData(property),
+      ...(req.body || {})
+    }
+  });
+}
+
 async function deleteProperty(req, res, next) {
   const property = await findPropertyForAdmin(req.params.id);
 
@@ -613,6 +655,7 @@ module.exports = {
   renderProperties,
   renderPropertyDetail,
   handleInterestEmail,
+  handlePropertyFormError,
   renderCreateProperty,
   createProperty,
   renderEditProperty,

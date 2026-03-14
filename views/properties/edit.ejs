@@ -57,7 +57,7 @@
     <input id="imagen_principal" name="imagen_principal" type="text" value="<%= formData.imagen_principal || '' %>" />
 
     <label for="imagenes_extra_files">Imagenes extra (archivos)</label>
-    <p class="field-help">Si cargas nuevas, se reemplaza la lista de imagenes extra.</p>
+    <p class="field-help">Si cargas nuevas, se reemplaza la lista de imagenes extra. Maximo 10 imagenes.</p>
     <input id="imagenes_extra_files" name="imagenes_extra_files" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" multiple />
 
     <label for="imagenes_extra">Imagenes extra (opcional por nombre/URL, una por linea)</label>
@@ -116,6 +116,18 @@
     const pisoInput = document.getElementById('piso');
     const plantasHelp = document.getElementById('plantas-help');
     const pisoHelp = document.getElementById('piso-help');
+    const extraImagesInput = document.getElementById('imagenes_extra_files');
+    const editForm = document.querySelector('form.contact-form');
+    const maxExtraImages = 10;
+
+    function validateExtraImagesSelection() {
+      if (!extraImagesInput || !extraImagesInput.files) return true;
+      if (extraImagesInput.files.length <= maxExtraImages) return true;
+
+      alert('Podes subir hasta 10 imagenes extra.');
+      extraImagesInput.value = '';
+      return false;
+    }
 
     function syncFieldsByTipo() {
       if (!tipoSelect) return;
@@ -158,6 +170,18 @@
     if (tipoSelect) {
       syncFieldsByTipo();
       tipoSelect.addEventListener('change', syncFieldsByTipo);
+    }
+
+    if (extraImagesInput) {
+      extraImagesInput.addEventListener('change', validateExtraImagesSelection);
+    }
+
+    if (editForm) {
+      editForm.addEventListener('submit', function (event) {
+        if (!validateExtraImagesSelection()) {
+          event.preventDefault();
+        }
+      });
     }
   })();
 </script>

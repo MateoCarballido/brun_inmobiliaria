@@ -13,5 +13,6 @@ router.post('/:id/edit', requireAdmin, uploadPropertyImages, propertyController.
 router.post('/:id/delete', requireAdmin, propertyController.deleteProperty);
 router.get('/:id', propertyController.renderPropertyDetail);
 router.post('/:id/contacto', requireAuthForConsultation, propertyController.handleInterestEmail);
+router.use(propertyController.handlePropertyFormError);
 
 module.exports = router;

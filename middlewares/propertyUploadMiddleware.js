@@ -1,6 +1,7 @@
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinaryLib = require('cloudinary').v2;
+const MAX_EXTRA_IMAGES = 10;
 
 const hasCloudinaryConfig = Boolean(
   process.env.CLOUDINARY_CLOUD_NAME &&
@@ -43,12 +44,33 @@ const upload = multer({
   }
 });
 
-const uploadPropertyImages = upload.fields([
+const uploadPropertyImagesBase = upload.fields([
   { name: 'imagen_principal_file', maxCount: 1 },
-  { name: 'imagenes_extra_files', maxCount: 10 }
+  { name: 'imagenes_extra_files', maxCount: MAX_EXTRA_IMAGES }
 ]);
+
+function uploadPropertyImages(req, res, next) {
+  uploadPropertyImagesBase(req, res, function(err) {
+    if (!err) {
+      return next();
+    }
+
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_UNEXPECTED_FILE' && err.field === 'imagenes_extra_files') {
+        err.status = 400;
+        err.userMessage = `Podes subir hasta ${MAX_EXTRA_IMAGES} imagenes extra.`;
+      } else if (err.code === 'LIMIT_FILE_SIZE') {
+        err.status = 400;
+        err.userMessage = 'Cada imagen puede pesar hasta 5MB.';
+      }
+    }
+
+    return next(err);
+  });
+}
 
 module.exports = {
   uploadPropertyImages,
+  MAX_EXTRA_IMAGES,
   hasCloudinaryConfig
 };
