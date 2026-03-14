@@ -2,6 +2,8 @@ const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinaryLib = require('cloudinary').v2;
 const MAX_EXTRA_IMAGES = 10;
+const ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+const ALLOWED_IMAGE_LABEL = 'JPG, PNG, WEBP o AVIF';
 
 const hasCloudinaryConfig = Boolean(
   process.env.CLOUDINARY_CLOUD_NAME &&
@@ -36,11 +38,13 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024
   },
   fileFilter: function (_req, file, cb) {
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
-    if (allowedMimeTypes.includes(file.mimetype)) {
+    if (ALLOWED_IMAGE_MIME_TYPES.includes(file.mimetype)) {
       return cb(null, true);
     }
-    return cb(new Error('Solo se permiten imagenes JPG, PNG, WEBP o AVIF.'));
+    const invalidTypeError = new Error(`Solo se permiten imagenes ${ALLOWED_IMAGE_LABEL}.`);
+    invalidTypeError.status = 400;
+    invalidTypeError.userMessage = `Solo se permiten imagenes ${ALLOWED_IMAGE_LABEL}.`;
+    return cb(invalidTypeError);
   }
 });
 
@@ -72,5 +76,7 @@ function uploadPropertyImages(req, res, next) {
 module.exports = {
   uploadPropertyImages,
   MAX_EXTRA_IMAGES,
+  ALLOWED_IMAGE_MIME_TYPES,
+  ALLOWED_IMAGE_LABEL,
   hasCloudinaryConfig
 };

@@ -95,7 +95,7 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
       <input id="direccion" name="direccion" type="text" placeholder="Av. Santa Fe 1234" value="<%= formData.direccion || '' %>" />
 
       <label for="imagen_principal_file">Imagen principal (archivo)</label>
-      <p class="field-help">Subi JPG, PNG o WEBP (max. 5MB).</p>
+      <p class="field-help">Subi JPG, PNG, WEBP o AVIF (max. 5MB).</p>
       <input id="imagen_principal_file" name="imagen_principal_file" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" />
 
       <label for="imagen_principal">Imagen principal (opcional por nombre/URL)</label>
@@ -103,7 +103,7 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
       <input id="imagen_principal" name="imagen_principal" type="text" placeholder="casa-palermo-01.jpg" value="<%= formData.imagen_principal || '' %>" />
 
       <label for="imagenes_extra_files">Imagenes extra (archivos)</label>
-      <p class="field-help">Podes seleccionar varias juntas. Maximo 10 imagenes extra.</p>
+      <p class="field-help">Podes seleccionar varias juntas. Maximo 10 imagenes extra. Formatos admitidos: JPG, PNG, WEBP o AVIF.</p>
       <input id="imagenes_extra_files" name="imagenes_extra_files" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" multiple />
 
       <label for="imagenes_extra">Imagenes extra (opcional por nombre/URL, una por linea)</label>
@@ -218,9 +218,26 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
     const plantasHelp = document.getElementById('plantas-help');
     const pisoHelp = document.getElementById('piso-help');
     const rows = Array.from(document.querySelectorAll('#admin-properties-body tr'));
+    const mainImageInput = document.getElementById('imagen_principal_file');
     const extraImagesInput = document.getElementById('imagenes_extra_files');
     const createForm = panel ? panel.querySelector('form') : null;
     const maxExtraImages = 10;
+    const allowedImageMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+    const allowedImageLabel = 'JPG, PNG, WEBP o AVIF';
+
+    function validateFileTypes(input, multiple) {
+      if (!input || !input.files || input.files.length === 0) return true;
+
+      const invalidFiles = Array.from(input.files).filter(function (file) {
+        return !allowedImageMimeTypes.includes(file.type);
+      });
+
+      if (invalidFiles.length === 0) return true;
+
+      alert('Solo se permiten imagenes ' + allowedImageLabel + '.');
+      input.value = '';
+      return false;
+    }
 
     function validateExtraImagesSelection() {
       if (!extraImagesInput || !extraImagesInput.files) return true;
@@ -294,13 +311,22 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
       tipoSelect.addEventListener('change', syncFieldsByTipo);
     }
 
+    if (mainImageInput) {
+      mainImageInput.addEventListener('change', function () {
+        validateFileTypes(mainImageInput, false);
+      });
+    }
+
     if (extraImagesInput) {
-      extraImagesInput.addEventListener('change', validateExtraImagesSelection);
+      extraImagesInput.addEventListener('change', function () {
+        if (!validateFileTypes(extraImagesInput, true)) return;
+        validateExtraImagesSelection();
+      });
     }
 
     if (createForm) {
       createForm.addEventListener('submit', function (event) {
-        if (!validateExtraImagesSelection()) {
+        if (!validateFileTypes(mainImageInput, false) || !validateFileTypes(extraImagesInput, true) || !validateExtraImagesSelection()) {
           event.preventDefault();
         }
       });

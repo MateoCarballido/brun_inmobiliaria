@@ -50,14 +50,14 @@
     <input id="direccion" name="direccion" type="text" value="<%= formData.direccion || '' %>" />
 
     <label for="imagen_principal_file">Imagen principal (archivo)</label>
-    <p class="field-help">Si subis una nueva, reemplaza la principal actual.</p>
+    <p class="field-help">Si subis una nueva, reemplaza la principal actual. Formatos admitidos: JPG, PNG, WEBP o AVIF.</p>
     <input id="imagen_principal_file" name="imagen_principal_file" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" />
 
     <label for="imagen_principal">Imagen principal (opcional por nombre/URL)</label>
     <input id="imagen_principal" name="imagen_principal" type="text" value="<%= formData.imagen_principal || '' %>" />
 
     <label for="imagenes_extra_files">Imagenes extra (archivos)</label>
-    <p class="field-help">Si cargas nuevas, se reemplaza la lista de imagenes extra. Maximo 10 imagenes.</p>
+    <p class="field-help">Si cargas nuevas, se reemplaza la lista de imagenes extra. Maximo 10 imagenes. Formatos admitidos: JPG, PNG, WEBP o AVIF.</p>
     <input id="imagenes_extra_files" name="imagenes_extra_files" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" multiple />
 
     <label for="imagenes_extra">Imagenes extra (opcional por nombre/URL, una por linea)</label>
@@ -116,9 +116,26 @@
     const pisoInput = document.getElementById('piso');
     const plantasHelp = document.getElementById('plantas-help');
     const pisoHelp = document.getElementById('piso-help');
+    const mainImageInput = document.getElementById('imagen_principal_file');
     const extraImagesInput = document.getElementById('imagenes_extra_files');
     const editForm = document.querySelector('form.contact-form');
     const maxExtraImages = 10;
+    const allowedImageMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+    const allowedImageLabel = 'JPG, PNG, WEBP o AVIF';
+
+    function validateFileTypes(input) {
+      if (!input || !input.files || input.files.length === 0) return true;
+
+      const invalidFiles = Array.from(input.files).filter(function (file) {
+        return !allowedImageMimeTypes.includes(file.type);
+      });
+
+      if (invalidFiles.length === 0) return true;
+
+      alert('Solo se permiten imagenes ' + allowedImageLabel + '.');
+      input.value = '';
+      return false;
+    }
 
     function validateExtraImagesSelection() {
       if (!extraImagesInput || !extraImagesInput.files) return true;
@@ -172,13 +189,22 @@
       tipoSelect.addEventListener('change', syncFieldsByTipo);
     }
 
+    if (mainImageInput) {
+      mainImageInput.addEventListener('change', function () {
+        validateFileTypes(mainImageInput);
+      });
+    }
+
     if (extraImagesInput) {
-      extraImagesInput.addEventListener('change', validateExtraImagesSelection);
+      extraImagesInput.addEventListener('change', function () {
+        if (!validateFileTypes(extraImagesInput)) return;
+        validateExtraImagesSelection();
+      });
     }
 
     if (editForm) {
       editForm.addEventListener('submit', function (event) {
-        if (!validateExtraImagesSelection()) {
+        if (!validateFileTypes(mainImageInput) || !validateFileTypes(extraImagesInput) || !validateExtraImagesSelection()) {
           event.preventDefault();
         }
       });
