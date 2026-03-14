@@ -95,7 +95,7 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
       <input id="direccion" name="direccion" type="text" placeholder="Av. Santa Fe 1234" value="<%= formData.direccion || '' %>" />
 
       <label for="imagen_principal_file">Imagen principal (archivo)</label>
-      <p class="field-help">Subi JPG, PNG o WEBP (max. 5MB). Se guarda en Cloudinary.</p>
+      <p class="field-help">Subi JPG, PNG o WEBP (max. 5MB).</p>
       <input id="imagen_principal_file" name="imagen_principal_file" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" />
 
       <label for="imagen_principal">Imagen principal (opcional por nombre/URL)</label>
@@ -103,7 +103,7 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
       <input id="imagen_principal" name="imagen_principal" type="text" placeholder="casa-palermo-01.jpg" value="<%= formData.imagen_principal || '' %>" />
 
       <label for="imagenes_extra_files">Imagenes extra (archivos)</label>
-      <p class="field-help">Podes seleccionar varias juntas. Maximo 10 imagenes extra. Se guardan en Cloudinary.</p>
+      <p class="field-help">Podes seleccionar varias juntas. Maximo 10 imagenes extra.</p>
       <input id="imagenes_extra_files" name="imagenes_extra_files" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/*" multiple />
 
       <label for="imagenes_extra">Imagenes extra (opcional por nombre/URL, una por linea)</label>
