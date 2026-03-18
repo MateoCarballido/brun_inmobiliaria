@@ -1,4 +1,3 @@
-const propertyModel = require('../models/propertyModel');
 const db = require('../database/models');
 const op = db.Sequelize.Op;
 const { buildAbsoluteUrl, buildSeo } = require('../lib/seo');
@@ -198,36 +197,7 @@ async function getAllProperties(filters) {
     console.error('Error loading properties from DB:', error.message);
   }
 
-  const fallbackProperties = propertyModel.getAllProperties();
-
-  if (!filters.search && !filters.operacion && !filters.tipo && !filters.moneda && !filters.ubicacion && !filters.precioMin && !filters.precioMax && !filters.dormitorios && !filters.banios) {
-    return fallbackProperties;
-  }
-
-  return fallbackProperties.filter((property) => {
-    const price = Number(property.precio);
-    const dormitorios = Number(property.dormitorios || 0);
-    const banios = Number(property.banios || 0);
-
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      const hasSearch = property.titulo.toLowerCase().includes(searchLower) ||
-        property.ubicacion.toLowerCase().includes(searchLower) ||
-        String(property.direccion || '').toLowerCase().includes(searchLower);
-      if (!hasSearch) return false;
-    }
-
-    if (filters.operacion && property.operacion !== filters.operacion) return false;
-    if (filters.tipo && property.tipo !== filters.tipo) return false;
-    if (filters.moneda && normalizeCurrency(property.moneda) !== normalizeCurrency(filters.moneda)) return false;
-    if (filters.ubicacion && !property.ubicacion.toLowerCase().includes(filters.ubicacion.toLowerCase())) return false;
-    if (filters.precioMin && price < Number(filters.precioMin)) return false;
-    if (filters.precioMax && price > Number(filters.precioMax)) return false;
-    if (filters.dormitorios && dormitorios < Number(filters.dormitorios)) return false;
-    if (filters.banios && banios < Number(filters.banios)) return false;
-
-    return true;
-  });
+  return [];
 }
 
 async function findPropertyById(id) {
@@ -250,7 +220,7 @@ async function findPropertyById(id) {
     console.error('Error loading property detail from DB:', error.message);
   }
 
-  return propertyModel.getPropertyById(id);
+  return null;
 }
 
 async function renderProperties(req, res) {

@@ -1,4 +1,3 @@
-const propertyModel = require('../models/propertyModel');
 const db = require('../database/models');
 const { buildAbsoluteUrl, buildSeo } = require('../lib/seo');
 
@@ -23,7 +22,7 @@ async function getFeaturedProperties() {
     console.error('Error loading featured properties from DB:', error.message);
   }
 
-  return propertyModel.getFeaturedProperties();
+  return [];
 }
 
 async function renderHome(req, res) {
