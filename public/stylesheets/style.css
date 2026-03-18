@@ -851,6 +851,7 @@ body.lightbox-open {
 .property-toolbar {
   display: flex;
   justify-content: flex-end;
+  gap: 0.6rem;
   margin-bottom: 0.85rem;
 }
 
@@ -858,6 +859,24 @@ body.lightbox-open {
   margin-top: 0;
   border-radius: 10px;
   padding: 0.6rem 1rem;
+}
+
+.property-share-btn {
+  margin-top: 0;
+  width: 43px;
+  height: 43px;
+  min-width: 43px;
+  padding: 0;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.property-share-btn svg {
+  width: 21px;
+  height: 21px;
+  display: block;
 }
 
 .property-tags {
