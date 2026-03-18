@@ -6,6 +6,10 @@ function resolveImageSrc(value) {
   if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('/')) return raw;
   return '/images/' + raw.replace(/^images\//, '').replace(/^\/images\//, '');
 }
+
+function formatCurrencyLabel(currency) {
+  return currency === 'ARS' ? '$' : 'USD';
+}
 %>
 
 <section class="section-header properties-head">
@@ -55,6 +59,13 @@ function resolveImageSrc(value) {
 
       <label for="ubicacion">Ubicacion</label>
       <input id="ubicacion" name="ubicacion" type="text" placeholder="Ej: Palermo, Buenos Aires" value="<%= filtros.ubicacion || '' %>" />
+
+      <label for="moneda">Moneda</label>
+      <select id="moneda" name="moneda">
+        <option value="">Todas</option>
+        <option value="USD" <%= filtros.moneda === 'USD' ? 'selected' : '' %>>Dolares (USD)</option>
+        <option value="ARS" <%= filtros.moneda === 'ARS' ? 'selected' : '' %>>Pesos (ARS)</option>
+      </select>
 
       <label>Precio</label>
       <div class="inline-2">
@@ -107,7 +118,7 @@ function resolveImageSrc(value) {
           <div class="property-body">
             <div class="row-between">
               <h3 class="card-title"><%= property.titulo %></h3>
-              <p class="price"><span>USD</span><span class="price-value"><%= Number(property.precio).toLocaleString('es-AR') %></span></p>
+              <p class="price"><span><%= formatCurrencyLabel(property.moneda) %></span><span class="price-value"><%= Number(property.precio).toLocaleString('es-AR') %></span></p>
             </div>
             <p class="location location-line">
               <span class="mini-svg" aria-hidden="true">

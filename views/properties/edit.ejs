@@ -41,6 +41,13 @@
         <input id="precio" name="precio" type="number" min="1" step="0.01" required value="<%= formData.precio || '' %>" />
       </div>
       <div>
+        <label for="moneda">Moneda</label>
+        <select id="moneda" name="moneda" required>
+          <option value="USD" <%= (formData.moneda || 'USD') === 'USD' ? 'selected' : '' %>>Dolares (USD)</option>
+          <option value="ARS" <%= formData.moneda === 'ARS' ? 'selected' : '' %>>Pesos (ARS)</option>
+        </select>
+      </div>
+      <div>
         <label for="ubicacion">Ubicacion</label>
         <input id="ubicacion" name="ubicacion" type="text" required value="<%= formData.ubicacion || '' %>" />
       </div>

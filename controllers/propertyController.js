@@ -4,6 +4,10 @@ const op = db.Sequelize.Op;
 const { buildAbsoluteUrl, buildSeo } = require('../lib/seo');
 const { MAX_EXTRA_IMAGES } = require('../middlewares/propertyUploadMiddleware');
 
+function normalizeCurrency(value) {
+  return value === 'ARS' ? 'ARS' : 'USD';
+}
+
 function normalizeImageReference(value) {
   if (!value) {
     return null;
@@ -114,6 +118,7 @@ function buildEditFormData(property) {
     operacion: property.operacion || 'venta',
     tipo: property.tipo || 'casa',
     precio: property.precio || '',
+    moneda: normalizeCurrency(property.moneda),
     ubicacion: property.ubicacion || '',
     direccion: property.direccion || '',
     imagen_principal: property.imagen_principal || '',
@@ -148,6 +153,10 @@ async function getAllProperties(filters) {
 
   if (filters.tipo) {
     whereClause.tipo = filters.tipo;
+  }
+
+  if (filters.moneda) {
+    whereClause.moneda = normalizeCurrency(filters.moneda);
   }
 
   if (filters.ubicacion) {
@@ -191,7 +200,7 @@ async function getAllProperties(filters) {
 
   const fallbackProperties = propertyModel.getAllProperties();
 
-  if (!filters.search && !filters.operacion && !filters.tipo && !filters.ubicacion && !filters.precioMin && !filters.precioMax && !filters.dormitorios && !filters.banios) {
+  if (!filters.search && !filters.operacion && !filters.tipo && !filters.moneda && !filters.ubicacion && !filters.precioMin && !filters.precioMax && !filters.dormitorios && !filters.banios) {
     return fallbackProperties;
   }
 
@@ -210,6 +219,7 @@ async function getAllProperties(filters) {
 
     if (filters.operacion && property.operacion !== filters.operacion) return false;
     if (filters.tipo && property.tipo !== filters.tipo) return false;
+    if (filters.moneda && normalizeCurrency(property.moneda) !== normalizeCurrency(filters.moneda)) return false;
     if (filters.ubicacion && !property.ubicacion.toLowerCase().includes(filters.ubicacion.toLowerCase())) return false;
     if (filters.precioMin && price < Number(filters.precioMin)) return false;
     if (filters.precioMax && price > Number(filters.precioMax)) return false;
@@ -248,6 +258,7 @@ async function renderProperties(req, res) {
     search: req.query.search ? req.query.search.trim() : '',
     operacion: req.query.operacion ? req.query.operacion.trim() : '',
     tipo: req.query.tipo ? req.query.tipo.trim() : '',
+    moneda: req.query.moneda ? normalizeCurrency(req.query.moneda.trim()) : '',
     ubicacion: req.query.ubicacion ? req.query.ubicacion.trim() : '',
     precioMin: req.query.precioMin ? req.query.precioMin.trim() : '',
     precioMax: req.query.precioMax ? req.query.precioMax.trim() : '',
@@ -293,6 +304,7 @@ async function renderPropertyDetail(req, res, next) {
     successMessage: null,
     mailtoLink: null,
     authNotice,
+    shareUrl: buildAbsoluteUrl(res.locals.siteUrl, `/propiedades/${property.id}`),
     seo: buildSeo({
       siteUrl: res.locals.siteUrl,
       canonicalPath: `/propiedades/${property.id}`,
@@ -369,6 +381,7 @@ async function handleInterestEmail(req, res, next) {
     successMessage: 'Tu consulta esta lista. Hace click en "Abrir cliente de mail" para enviarla.',
     mailtoLink,
     authNotice: null,
+    shareUrl: buildAbsoluteUrl(res.locals.siteUrl, `/propiedades/${property.id}`),
     seo: buildSeo({
       siteUrl: res.locals.siteUrl,
       canonicalPath: `/propiedades/${property.id}`,
@@ -405,6 +418,7 @@ async function createProperty(req, res) {
     operacion,
     tipo,
     precio,
+    moneda,
     ubicacion,
     direccion,
     imagen_principal,
@@ -448,6 +462,7 @@ async function createProperty(req, res) {
       operacion,
       tipo,
       precio,
+      moneda: normalizeCurrency(moneda),
       ubicacion,
       direccion: direccion || null,
       imagen_principal: normalizedMainImage,
@@ -508,6 +523,7 @@ async function updateProperty(req, res, next) {
     operacion,
     tipo,
     precio,
+    moneda,
     ubicacion,
     direccion,
     imagen_principal,
@@ -548,6 +564,7 @@ async function updateProperty(req, res, next) {
       operacion,
       tipo,
       precio,
+      moneda: normalizeCurrency(moneda),
       ubicacion,
       direccion: direccion || null,
       imagen_principal: normalizedMainImage,

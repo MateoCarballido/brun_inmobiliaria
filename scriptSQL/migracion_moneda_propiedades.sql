@@ -1,0 +1,2 @@
+ALTER TABLE propiedades
+ADD COLUMN moneda ENUM('USD','ARS') NOT NULL DEFAULT 'USD' AFTER precio;

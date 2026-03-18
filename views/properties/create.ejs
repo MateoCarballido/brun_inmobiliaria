@@ -6,6 +6,10 @@ const hasFormData = formData && Object.keys(formData).some(function (key) {
   return value !== undefined && value !== null && String(value).trim() !== '';
 });
 const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
+
+function formatCurrencyLabel(currency) {
+  return currency === 'ARS' ? '$' : 'USD';
+}
 %>
 
 <section class="admin-properties-box admin-panel">
@@ -82,6 +86,14 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
           <label for="precio">Precio</label>
           <p class="field-help">Sin puntos ni simbolos. Ejemplo: 185000</p>
           <input id="precio" name="precio" type="number" min="1" step="0.01" required placeholder="185000" value="<%= formData.precio || '' %>" />
+        </div>
+        <div>
+          <label for="moneda">Moneda</label>
+          <p class="field-help">Elegi si el precio se publica en pesos o en dolares.</p>
+          <select id="moneda" name="moneda" required>
+            <option value="USD" <%= (formData.moneda || 'USD') === 'USD' ? 'selected' : '' %>>Dolares (USD)</option>
+            <option value="ARS" <%= formData.moneda === 'ARS' ? 'selected' : '' %>>Pesos (ARS)</option>
+          </select>
         </div>
         <div>
           <label for="ubicacion">Ubicacion</label>
@@ -183,7 +195,7 @@ const shouldOpenCreateForm = Boolean(errorMessage || hasFormData);
                   <small><%= property.direccion %></small>
                 <% } %>
               </td>
-              <td>USD <%= Number(property.precio).toLocaleString('es-AR') %></td>
+              <td><%= formatCurrencyLabel(property.moneda) %> <%= Number(property.precio).toLocaleString('es-AR') %></td>
               <td>
                 <span class="mini-badge mini-badge-soft"><%= property.operacion === 'alquiler' ? 'Alquiler' : 'Venta' %></span>
               </td>

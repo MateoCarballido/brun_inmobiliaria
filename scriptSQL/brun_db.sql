@@ -22,6 +22,7 @@ CREATE TABLE propiedades (
   operacion ENUM('venta','alquiler') NOT NULL,
   tipo ENUM('casa','departamento','terreno','local_comercial','oficina') NOT NULL,
   precio DECIMAL(12,2) NOT NULL,
+  moneda ENUM('USD','ARS') NOT NULL DEFAULT 'USD',
   ubicacion VARCHAR(200) NOT NULL,
   direccion VARCHAR(200),
   imagen_principal VARCHAR(500),

@@ -25,6 +25,9 @@ module.exports = function (sequelize, dataTypes) {
     precio: {
       type: dataTypes.DECIMAL(12, 2)
     },
+    moneda: {
+      type: dataTypes.ENUM('USD', 'ARS')
+    },
     ubicacion: {
       type: dataTypes.STRING
     },

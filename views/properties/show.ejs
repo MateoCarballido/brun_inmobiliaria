@@ -46,7 +46,24 @@ function formatPropertyType(value) {
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }
 
+function formatCurrencyLabel(currency) {
+  return currency === 'ARS' ? '$' : 'USD';
+}
+
+function getWhatsappShareLink(currentProperty, currentShareUrl) {
+  const message = [
+    'Hola, te comparto esta propiedad:',
+    currentProperty.titulo,
+    currentProperty.ubicacion ? 'Ubicacion: ' + currentProperty.ubicacion : null,
+    'Precio: ' + formatCurrencyLabel(currentProperty.moneda) + ' ' + Number(currentProperty.precio).toLocaleString('es-AR'),
+    currentShareUrl
+  ].filter(Boolean).join('\n');
+
+  return 'https://wa.me/?text=' + encodeURIComponent(message);
+}
+
 const galleryImages = getGalleryImages(property);
+const whatsappShareLink = getWhatsappShareLink(property, shareUrl);
 %>
 
 <section class="property-hero">
@@ -108,6 +125,7 @@ const galleryImages = getGalleryImages(property);
   <article class="property-main-card">
     <div class="property-toolbar no-print">
       <button type="button" class="btn btn-light property-print-btn" id="print-property-sheet">Imprimir ficha</button>
+      <a href="<%= whatsappShareLink %>" class="btn btn-dark" target="_blank" rel="noopener noreferrer">Compartir por WhatsApp</a>
     </div>
 
     <div class="property-tags">
@@ -130,7 +148,7 @@ const galleryImages = getGalleryImages(property);
       <p class="property-street"><%= property.direccion %></p>
     <% } %>
 
-    <p class="property-price">USD <%= Number(property.precio).toLocaleString('es-AR') %></p>
+    <p class="property-price"><%= formatCurrencyLabel(property.moneda) %> <%= Number(property.precio).toLocaleString('es-AR') %></p>
 
     <div class="property-metrics">
       <div class="metric-card">
@@ -208,7 +226,7 @@ const galleryImages = getGalleryImages(property);
         <input id="telefono" name="telefono" type="text" placeholder="11.5839.9513" />
 
         <label for="mensaje">Mensaje</label>
-        <textarea id="mensaje" name="mensaje" rows="4">Hola, me interesa <%= property.titulo %> (USD <%= Number(property.precio).toLocaleString('es-AR') %>). Me gustaría recibir más información.</textarea>
+        <textarea id="mensaje" name="mensaje" rows="4">Hola, me interesa <%= property.titulo %> (<%= formatCurrencyLabel(property.moneda) %> <%= Number(property.precio).toLocaleString('es-AR') %>). Me gustaría recibir más información.</textarea>
 
         <button type="submit" class="btn btn-dark">Enviar consulta</button>
       </form>

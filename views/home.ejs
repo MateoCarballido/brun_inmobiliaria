@@ -6,6 +6,10 @@ function resolveImageSrc(value) {
   if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('/')) return raw;
   return '/images/' + raw.replace(/^images\//, '').replace(/^\/images\//, '');
 }
+
+function formatCurrencyLabel(currency) {
+  return currency === 'ARS' ? '$' : 'USD';
+}
 %>
 
 <section class="landing-hero">
@@ -36,6 +40,11 @@ function resolveImageSrc(value) {
     </select>
 
     <input name="ubicacion" type="text" placeholder="Ubicacion" />
+    <select name="moneda">
+      <option value="">Moneda</option>
+      <option value="USD">Dolares</option>
+      <option value="ARS">Pesos</option>
+    </select>
     <input name="precioMin" type="number" min="0" step="0.01" placeholder="Precio min" />
 
     <button type="submit" class="btn btn-dark search-btn">Buscar</button>
@@ -67,7 +76,7 @@ function resolveImageSrc(value) {
       <div class="property-body">
         <div class="row-between">
           <h3 class="card-title"><%= property.titulo %></h3>
-          <p class="price"><span>USD</span><span class="price-value"><%= Number(property.precio).toLocaleString('es-AR') %></span></p>
+          <p class="price"><span><%= formatCurrencyLabel(property.moneda) %></span><span class="price-value"><%= Number(property.precio).toLocaleString('es-AR') %></span></p>
         </div>
         <p class="location location-line">
           <span class="mini-svg" aria-hidden="true">
