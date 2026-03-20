@@ -20,7 +20,7 @@ module.exports = function (sequelize, dataTypes) {
       type: dataTypes.ENUM('venta', 'alquiler')
     },
     tipo: {
-      type: dataTypes.ENUM('casa', 'departamento', 'terreno', 'local_comercial', 'oficina')
+      type: dataTypes.ENUM('casa', 'departamento', 'terreno', 'galpon', 'local_comercial', 'oficina')
     },
     precio: {
       type: dataTypes.DECIMAL(12, 2)
